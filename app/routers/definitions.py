@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 
-from app.lib.langs.ag.lexicon import LsjEntry
+from app.lib.lexicon import LexiconEntry
 
 router = APIRouter()
 
 @router.get("/{lang}/{lemma}")
 async def get_definition(lang: str, lemma: str):
-    defs = await LsjEntry.get("01GYGRVW2T513VYERENJF77NEM")
+    defs = await LexiconEntry.find(LexiconEntry.lemma == lemma).all()
     return {"definitions": defs}
