@@ -1,9 +1,7 @@
 import re
 from dataclasses import dataclass
 from enum import StrEnum, auto
-from typing import Literal, Self
 
-import lookup
 from utils import at
 
 
@@ -69,9 +67,9 @@ case_tags = {
 
 @dataclass
 class Word:
+    form: str
     id: int | None
     head: int | None
-    form: str | None
     lemma: str | None
     definition: str | None
     pos: POS | None
@@ -112,7 +110,7 @@ def parse_word(attr: dict) -> Word | None:
     return Word(
         id=parse_int(attr.get("id")),
         head=parse_int(attr.get("head")),
-        form=attr.get("form"),
+        form=attr["form"],
         lemma=lemma,
         definition=definition,
         pos=pos,
