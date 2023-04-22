@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.lib.lexicon import LexiconEntry
+from app.core.lexicon import LexiconEntry
 
 router = APIRouter()
 
