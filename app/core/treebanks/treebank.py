@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Generator, Literal
+from typing import Generator, Literal, Self
 
 from boltons.iterutils import split_iter
 from dominate.tags import *  # type: ignore
@@ -42,6 +42,9 @@ class Treebank(ABC):
     format: Format
     meta: Metadata
 
+    # def __getitem__(self, ref: Ref | RefRange) -> Self:
+    #     pass
+    
     @property
     def ref_type(self) -> str:
         return type(self.meta.start).__name__
