@@ -22,6 +22,7 @@ python-dotenv = "^1.0.0"
 black = "^23.3.0"
 jupyter = "^1.0.0"
 types-lxml = "^2023.3.28"
+pytest = "^7.3.1"
 
 [build-system]
 requires = ["poetry-core"]

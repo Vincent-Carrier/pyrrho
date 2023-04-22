@@ -55,10 +55,9 @@ class Treebank(ABC):
         pass
 
     def paragraphs(self) -> Generator[Paragraph, None, None]:
-        for paragraph in split_iter(
+        yield from split_iter(
             self.sentences(), lambda a, b: a.subdoc != b.subdoc
-        ):
-            yield paragraph
+        )
 
     def render(self) -> str:
         with pre(cls=f"greek {self.format} syntax", data_urn=self.meta.urn) as html:

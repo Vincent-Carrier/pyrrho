@@ -33,7 +33,7 @@ class AgldTreebank(Treebank):
     def sentence(self, sentence: Sentence):
         def tag(w: Word, next: Word | None = None):
             span(
-                w.form + '' if next and next.form in ''.split('.,;:') else ' ',
+                w.form + "" if next and next.form in "".split(".,;:") else " ",
                 cls=f"{w.pos if w.pos == 'verb' else ''} {w.case or ''}",
                 data_id=str(w.id),
                 data_head=str(w.head),
@@ -68,9 +68,5 @@ class AgldTreebank(Treebank):
 
     def sentences(self) -> Generator[Sentence, None, None]:
         for s in self.root.findall(".//sentence"):
-            words = []
-            for word in s:
-                w = parse_word(word.attrib)  # type: ignore
-                if w:
-                    words.append(w)
+            words: list[Word] = [w := parse_word(token.attrib) for token in s if w is not None]  # type: ignore
             yield Sentence(words, s.attrib.get("subdoc") or "")
