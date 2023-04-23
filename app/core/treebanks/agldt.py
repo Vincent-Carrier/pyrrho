@@ -1,25 +1,27 @@
 from itertools import pairwise
 from typing import Generator
+from xml.etree.ElementTree import Element
 
-from dominate.tags import *  # type: ignore
+from dominate.tags import span
 from lxml import etree
 
-from app.core.treebanks.treebank import Format, Metadata, Sentence, Treebank
-from app.core.treebanks.word import Word, parse_word, re
+from .ref import Ref, RefRange
+from .treebank import Metadata, Sentence, Treebank
+from .word import Word, parse_word
 
 
 class AgldTreebank(Treebank):
     root: etree._Element
     gorman: bool
+    _subdocs: list[Ref | RefRange] = []
 
     def __init__(
         self,
         f: str,
         meta: Metadata,
-        format: Format = "prose",
         gorman: bool = False,
     ) -> None:
-        super().__init__(format, meta)
+        super().__init__(meta)
         self.gorman = gorman
 
         tree = etree.parse(f)
@@ -30,10 +32,23 @@ class AgldTreebank(Treebank):
         if self.meta.urn:
             self.meta.urn = self.normalize_urn(self.meta.urn)
 
-    def sentence(self, sentence: Sentence):
+        self._subdocs = [
+            RefRange.parse(subdoc) if "-" in subdoc else Ref.parse(subdoc)
+            for sentence in self.root.findall(".//sentence")
+            if (subdoc := sentence.attrib.get("subdoc")) is not None
+        ]
+
+    def __getitem__(self, ref: Ref | RefRange) -> list[Sentence]:
+        match ref:
+            case RefRange(start, end): return self[start:end]
+            case Ref(): 
+                return self[RefRange(ref, ref)]
+            case _: raise TypeError(f"Cannot get {ref} from {self}")
+            
+    def render_sentence(self, sentence: Sentence):
         def tag(w: Word, next: Word | None = None):
             span(
-                w.form + "" if next and next.form in "".split(".,;:") else " ",
+                w.form + "" if next and next.form in "".split(".,;:·") else " ",
                 cls=f"{w.pos if w.pos == 'verb' else ''} {w.case or ''}",
                 data_id=str(w.id),
                 data_head=str(w.head),
@@ -42,7 +57,7 @@ class AgldTreebank(Treebank):
                 data_flags=w.flags,
             )
 
-        if self.format == "verse":
+        if self.meta.format == "verse":
             raise NotImplementedError()
             # with p(style='display: inline;'):
             #     new_line = False
@@ -67,6 +82,8 @@ class AgldTreebank(Treebank):
         return re.search(r"^(urn:cts:greekLit:tlg\d{4}.tlg\d{3}).*", urn).group(1)  # type: ignore
 
     def sentences(self) -> Generator[Sentence, None, None]:
-        for s in self.root.findall(".//sentence"):
-            words: list[Word] = [w := parse_word(token.attrib) for token in s if w is not None]  # type: ignore
-            yield Sentence(words, s.attrib.get("subdoc") or "")
+        yield from (self.sentence(el) for el in self.root.findall(".//sentence"))  # type: ignore
+    
+    def sentence(self, el: Element) -> Sentence:
+        words: list[Word] = [w for token in el if (w := parse_word(token.attrib)) is not None]
+        return Sentence(words, el.attrib.get("subdoc") or "")
