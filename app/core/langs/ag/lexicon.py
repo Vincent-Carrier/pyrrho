@@ -18,6 +18,6 @@ async def seed_lsj():
         root = etree.parse(p.as_posix()).getroot()
         for entry in root.findall(".//entryFree"):
             lemma = entry.attrib["key"]
-            definitions = [re.sub(TRAILING_REGEX, "", e.text) for e in entry.findall(".//tr") if e.text] # type: ignore
+            definitions = [re.sub(TRAILING_REGEX, "", e.text) for e in entry.findall(".//tr") if e.text]
             if len(definitions) > 0:
                 await LexiconEntry(lemma=lemma, definitions=definitions).save()

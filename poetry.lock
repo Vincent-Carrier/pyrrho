@@ -1350,6 +1350,21 @@ htmlsoup = ["BeautifulSoup4"]
 source = ["Cython (>=0.29.7)"]
 
 [[package]]
+name = "lxml-stubs"
+version = "0.4.0"
+description = "Type annotations for the lxml package"
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "lxml-stubs-0.4.0.tar.gz", hash = "sha256:184877b42127256abc2b932ba8bd0ab5ea80bd0b0fee618d16daa40e0b71abee"},
+    {file = "lxml_stubs-0.4.0-py3-none-any.whl", hash = "sha256:3b381e9e82397c64ea3cc4d6f79d1255d015f7b114806d4826218805c10ec003"},
+]
+
+[package.extras]
+test = ["coverage[toml] (==5.2)", "pytest (>=6.0.0)", "pytest-mypy-plugins (==1.9.3)"]
+
+[[package]]
 name = "markupsafe"
 version = "2.1.2"
 description = "Safely add untrusted strings to HTML/XML markup."
@@ -2600,51 +2615,6 @@ docs = ["myst-parser", "pydata-sphinx-theme", "sphinx"]
 test = ["argcomplete (>=2.0)", "pre-commit", "pytest", "pytest-mock"]
 
 [[package]]
-name = "types-beautifulsoup4"
-version = "4.12.0.3"
-description = "Typing stubs for beautifulsoup4"
-category = "dev"
-optional = false
-python-versions = "*"
-files = [
-    {file = "types-beautifulsoup4-4.12.0.3.tar.gz", hash = "sha256:64b71d44d6a6030e39bb324dd51ef176bec158cd4d2994ed7213c1b2b8fa0785"},
-    {file = "types_beautifulsoup4-4.12.0.3-py3-none-any.whl", hash = "sha256:019e1a9096ecd12a37981d562cfed405398e6ed3c7717852c1f01871d052906a"},
-]
-
-[package.dependencies]
-types-html5lib = "*"
-
-[[package]]
-name = "types-html5lib"
-version = "1.1.11.13"
-description = "Typing stubs for html5lib"
-category = "dev"
-optional = false
-python-versions = "*"
-files = [
-    {file = "types-html5lib-1.1.11.13.tar.gz", hash = "sha256:2a5ced934bcc7b47800b88ddb2541bbdf5bded7fb6d421693c978228e1fe631d"},
-    {file = "types_html5lib-1.1.11.13-py3-none-any.whl", hash = "sha256:d01603307f3bb39af9712e72eda5aa498420fe12179411533a54b2b03f6531eb"},
-]
-
-[[package]]
-name = "types-lxml"
-version = "2023.3.28"
-description = "Complete lxml external type annotation"
-category = "dev"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "types_lxml-2023.3.28-py3-none-any.whl", hash = "sha256:f1b5867e8ff5be5084916738dfc1cb9e003ae6350e97c74d00929f5910965558"},
-    {file = "types_lxml-2023.3.28.tar.gz", hash = "sha256:8b072a331520582f2d7c44110a53885605679ee79a09d39ef59b1abfc6109380"},
-]
-
-[package.dependencies]
-types-beautifulsoup4 = "*"
-
-[package.extras]
-dev = ["black", "isort", "lxml (>=4.9,<5.0)", "mypy (>=1.1.0,<1.2.0)", "pyright (>=1.1.288)", "pytest-mypy-plugins (>1.10.0,<2.0)"]
-
-[[package]]
 name = "types-pyopenssl"
 version = "23.1.0.2"
 description = "Typing stubs for pyOpenSSL"
@@ -2977,4 +2947,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "4ba85d2a21c27f2d5e9bf8421c9143991facb18282aa28e330d879a27e93e3e2"
+content-hash = "76baee378feab4f702ebe80d8fd216976cfb30f0682d6cc627eecc8e6c5dc300"

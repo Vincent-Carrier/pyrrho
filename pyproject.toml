@@ -21,9 +21,9 @@ python-dotenv = "^1.0.0"
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
 jupyter = "^1.0.0"
-types-lxml = "^2023.3.28"
 pytest = "^7.3.1"
 mypy = "^1.2.0"
+lxml-stubs = "^0.4.0"
 
 [tool.mypy]
 warn_unused_configs = true

@@ -6,13 +6,13 @@ from boltons.iterutils import split_iter
 from dominate.tags import p, pre, span
 from word import Word
 
-from app.core.treebanks.ref import Ref, RefRange
+from app.core.treebanks.ref import Ref, RefRange, SubDoc
 
 
 @dataclass
 class Sentence:
     words: list[Word]
-    subdoc: str = ""
+    subdoc: SubDoc # | None = None
 
     def __iter__(self):
         return iter(self.words)
@@ -32,8 +32,8 @@ Paragraph = list[Sentence]
 class Metadata:
     title: str = "untitled"
     author: str = "unknown"
-    urn: str | None = None
-    eng_urn: str | None = None
+    urn: str | bytes | None = None
+    eng_urn: str | bytes | None = None
     start: Ref | None = None
     end: Ref | None = None
     format: Format = "prose"

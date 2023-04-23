@@ -1,11 +1,11 @@
-from itertools import pairwise
+from itertools import dropwhile, pairwise, takewhile
 from typing import Generator
 from xml.etree.ElementTree import Element
 
 from dominate.tags import span
 from lxml import etree
 
-from .ref import Ref, RefRange
+from .ref import Ref, RefRange, SubDoc
 from .treebank import Metadata, Sentence, Treebank
 from .word import Word, parse_word
 
@@ -33,18 +33,32 @@ class AgldTreebank(Treebank):
             self.meta.urn = self.normalize_urn(self.meta.urn)
 
         self._subdocs = [
-            RefRange.parse(subdoc) if "-" in subdoc else Ref.parse(subdoc)
+            _parse_subdoc(subdoc)
             for sentence in self.root.findall(".//sentence")
-            if (subdoc := sentence.attrib.get("subdoc")) is not None
+            if (_subdoc := sentence.attrib.get("subdoc")) is not None
+            and (subdoc := str(_subdoc)) != ""
         ]
 
-    def __getitem__(self, ref: Ref | RefRange) -> list[Sentence]:
+    def __getitem__(self, ref: SubDoc | str) -> list[Sentence]:
         match ref:
-            case RefRange(start, end): return self[start:end]
-            case Ref(): 
-                return self[RefRange(ref, ref)]
-            case _: raise TypeError(f"Cannot get {ref} from {self}")
-            
+            case str():
+                return self[_parse_subdoc(ref)]
+            case RefRange(start, end):
+                # TODO: make this more efficient / robust
+                lstripped = dropwhile(lambda s: s.subdoc != start, self.sentences())
+                rstripped = takewhile(lambda s: s.subdoc != end, lstripped)
+                return list(rstripped)
+            case Ref():
+                if ref in self._subdocs:
+                    el = self.root.find(
+                        f".//sentence[@subdoc='{ref}']"
+                    )  # TODO: paragraphs, etc.
+                    if el:
+                        return [self.sentence(el)]  # type: ignore
+                return []
+            case _:
+                raise TypeError(f"Cannot get {ref} from {self}")
+
     def render_sentence(self, sentence: Sentence):
         def tag(w: Word, next: Word | None = None):
             span(
@@ -59,31 +73,24 @@ class AgldTreebank(Treebank):
 
         if self.meta.format == "verse":
             raise NotImplementedError()
-            # with p(style='display: inline;'):
-            #     new_line = False
-            #     verse_num = sentence[0].loc and sentence[0].loc.verse
-            #     for w, next in pairwise(sentence):
-            #         if w.loc:
-            #             verse_num = w.loc.verse
-            #         if next.loc and next.loc.verse != verse_num:
-            #             new_line = True
-            #         tag(w, next)
-            #         if next.loc and new_line:
-            #             br()
-            #             new_line = False
-            #     tag(sentence[-1])
         else:
             with span(cls="sentence"):
                 for w, next in pairwise(sentence):
                     tag(w, next)
                 tag(sentence[-1])
 
-    def normalize_urn(self, urn: str) -> str:
-        return re.search(r"^(urn:cts:greekLit:tlg\d{4}.tlg\d{3}).*", urn).group(1)  # type: ignore
+    def normalize_urn(self, urn: str | bytes) -> str:
+        return re.search(r"^(urn:cts:greekLit:tlg\d{4}.tlg\d{3}).*", str(urn)).group(1)  # type: ignore
 
     def sentences(self) -> Generator[Sentence, None, None]:
         yield from (self.sentence(el) for el in self.root.findall(".//sentence"))  # type: ignore
-    
+
     def sentence(self, el: Element) -> Sentence:
-        words: list[Word] = [w for token in el if (w := parse_word(token.attrib)) is not None]
-        return Sentence(words, el.attrib.get("subdoc") or "")
+        words: list[Word] = [
+            w for token in el if (w := parse_word(token.attrib)) is not None
+        ]
+        return Sentence(words, _parse_subdoc(el.attrib["subdoc"]))
+
+
+def _parse_subdoc(subdoc: str) -> SubDoc:
+    return RefRange.parse(subdoc) if "-" in subdoc else Ref.parse(subdoc)
