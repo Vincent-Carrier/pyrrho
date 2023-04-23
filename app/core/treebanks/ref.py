@@ -1,6 +1,6 @@
 from abc import ABC
 from dataclasses import astuple, dataclass
-from typing import Self
+from typing import Self, Type
 
 
 @dataclass(order=True, frozen=True)
@@ -13,7 +13,7 @@ class Ref(ABC):
 
     @classmethod
     def parse(cls, ref: str) -> Self:
-        return cls(*[int(x) for x in ref.split(".")])
+        return cls(*(int(x) for x in ref.split(".")))
 
     def __contains__(self, ref: object) -> bool:
         if not isinstance(ref, Ref):
@@ -32,9 +32,9 @@ class RefRange:
     end: Ref
 
     @classmethod
-    def parse(cls, ref: str) -> Self:
+    def parse(cls, ref_cls: Type[Ref], ref: str) -> Self:
         start, end = ref.split("-")
-        return cls(Ref.parse(start), Ref.parse(end))
+        return cls(ref_cls.parse(start), ref_cls.parse(end))
 
     def __str__(self) -> str:
         return f"{self.start}-{self.end}"
@@ -55,14 +55,14 @@ SubDoc = Ref | RefRange
 @dataclass(order=True, frozen=True, slots=True)
 class BCV(Ref):
     book: int
-    chapter: int
-    verse: int | None
+    chapter: int | None = None
+    verse: int | None = None
 
 
 @dataclass(order=True, frozen=True, slots=True)
 class CV(Ref):
     chapter: int
-    verse: int
+    verse: int | None = None
 
 
 @dataclass(order=True, frozen=True, slots=True)

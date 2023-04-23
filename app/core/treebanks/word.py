@@ -2,7 +2,7 @@ import re
 from dataclasses import dataclass
 from enum import StrEnum, auto
 
-from utils import at
+from app.core.utils import at
 
 
 @dataclass
@@ -98,9 +98,9 @@ def parse_word(attr: dict) -> Word | None:
     lemma = attr.get("lemma")
     if lemma:
         lemma = re.sub(r"\d+$", "", lemma)
-    definition = lookup.lsj.get(lemma)
-    if definition:
-        definition = re.sub(r"\W+$", "", definition)
+    definition = "" # TODO
+    # if definition:
+    #     definition = re.sub(r"\W+$", "", definition)
 
     def parse_int(s: str | None) -> int | None:
         if s is None:

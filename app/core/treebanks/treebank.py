@@ -1,24 +1,24 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generator, Literal, Self
+from typing import Generator, Generic, Literal, Type, TypeVar
 
 from boltons.iterutils import split_iter
 from dominate.tags import p, pre, span
-from word import Word
 
-from app.core.treebanks.ref import Ref, RefRange, SubDoc
+from .ref import Ref, RefRange, SubDoc
+from .word import Word
 
 
 @dataclass
 class Sentence:
     words: list[Word]
-    subdoc: SubDoc # | None = None
+    subdoc: SubDoc  # | None = None
 
     def __iter__(self):
         return iter(self.words)
 
-    def __getitem__(self, index):
-        return self.words[index]
+    def __getitem__(self, i):
+        return self.words[i]
 
     def __len__(self):
         return len(self.words)
@@ -28,27 +28,24 @@ Format = Literal["prose", "verse"]
 Paragraph = list[Sentence]
 
 
-@dataclass
+@dataclass(slots=True)
 class Metadata:
-    title: str = "untitled"
-    author: str = "unknown"
+    title: str = "<untitled>"
+    author: str = "<unknown>"
     urn: str | bytes | None = None
     eng_urn: str | bytes | None = None
-    start: Ref | None = None
-    end: Ref | None = None
     format: Format = "prose"
 
 
 @dataclass
 class Treebank(ABC):
     meta: Metadata
-
-    @property
-    def ref_type(self) -> str:
-        return type(self.meta.start).__name__
+    ref_cls: Type[Ref]
+    start: Ref | None = None
+    end: Ref | None = None
 
     @abstractmethod
-    def __getitem__(self, ref: Ref | RefRange) -> list[Sentence]:
+    def __getitem__(self, ref: SubDoc) -> list[Sentence]:
         pass
 
     @abstractmethod

@@ -1,5 +1,6 @@
+import re
 from itertools import dropwhile, pairwise, takewhile
-from typing import Generator
+from typing import Generator, Type
 from xml.etree.ElementTree import Element
 
 from dominate.tags import span
@@ -19,9 +20,10 @@ class AgldTreebank(Treebank):
         self,
         f: str,
         meta: Metadata,
+        ref_cls: Type[Ref],
         gorman: bool = False,
     ) -> None:
-        super().__init__(meta)
+        super().__init__(meta, ref_cls=ref_cls)
         self.gorman = gorman
 
         tree = etree.parse(f)
@@ -33,7 +35,7 @@ class AgldTreebank(Treebank):
             self.meta.urn = self.normalize_urn(self.meta.urn)
 
         self._subdocs = [
-            _parse_subdoc(subdoc)
+            self._parse_subdoc(subdoc)
             for sentence in self.root.findall(".//sentence")
             if (_subdoc := sentence.attrib.get("subdoc")) is not None
             and (subdoc := str(_subdoc)) != ""
@@ -42,7 +44,7 @@ class AgldTreebank(Treebank):
     def __getitem__(self, ref: SubDoc | str) -> list[Sentence]:
         match ref:
             case str():
-                return self[_parse_subdoc(ref)]
+                return self[self._parse_subdoc(ref)]
             case RefRange(start, end):
                 # TODO: make this more efficient / robust
                 lstripped = dropwhile(lambda s: s.subdoc != start, self.sentences())
@@ -89,8 +91,8 @@ class AgldTreebank(Treebank):
         words: list[Word] = [
             w for token in el if (w := parse_word(token.attrib)) is not None
         ]
-        return Sentence(words, _parse_subdoc(el.attrib["subdoc"]))
+        return Sentence(words, self._parse_subdoc(el.attrib["subdoc"]))
 
 
-def _parse_subdoc(subdoc: str) -> SubDoc:
-    return RefRange.parse(subdoc) if "-" in subdoc else Ref.parse(subdoc)
+    def _parse_subdoc(self, subdoc: str) -> SubDoc:
+        return RefRange.parse(self.ref_cls, subdoc) if "-" in subdoc else self.ref_cls.parse(subdoc)

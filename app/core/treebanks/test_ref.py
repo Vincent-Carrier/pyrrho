@@ -1,6 +1,6 @@
 import pytest
 
-from .ref import BCV, CV, Ref
+from .ref import BCV, CV, Ref, RefRange
 
 eq_tests = [
     (BCV(1, 1, 1), BCV(1, 1, 1), True),
@@ -34,3 +34,12 @@ ref_contains_tests = [
 @pytest.mark.parametrize("a, b, expected", ref_contains_tests)
 def test_ref_contains(a: Ref, b: Ref, expected: bool):
     assert (b in a) == expected
+
+def test_parse():
+    assert BCV.parse("1.1.1") == BCV(1, 1, 1)
+    assert BCV.parse("1.1") == BCV(1, 1, None)
+    assert CV.parse("1.1") == CV(1, 1)
+    assert CV.parse("1") == CV(1)
+
+def test_parse_range():
+    assert RefRange.parse(BCV, "1.1.1-1.1.2") == RefRange(BCV(1, 1, 1), BCV(1, 1, 2))

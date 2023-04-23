@@ -13269,7 +13269,7 @@
       <word id="26" form="νήσων" lemma="νῆσος" postag="n-p---fg-" relation="ATR" head="24"/>
       <word id="27" form="." lemma="." postag="u--------" relation="AuxK" head="0"/>
     </sentence>
-    <sentence id="562" document_id="urn:cts:greekLit:tlg0016.tlg001.perseus-grc1" subdoc="1.82,3">
+    <sentence id="562" document_id="urn:cts:greekLit:tlg0016.tlg001.perseus-grc1" subdoc="1.82.3">
       <word id="1" form="βοηθησάντων" lemma="βοηθέω" postag="v-papamg-" relation="ADV" head="9"/>
       <word id="2" form="δὲ" lemma="δέ" postag="d--------" relation="AuxY" head="9"/>
       <word id="3" form="Ἀργείων" lemma="Ἀργεῖος" postag="n-p---mg-" relation="SBJ" head="1"/>
