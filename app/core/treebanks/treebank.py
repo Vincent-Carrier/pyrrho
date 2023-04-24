@@ -4,7 +4,7 @@ from itertools import takewhile
 from typing import Any, Generator, Literal, Type
 
 import dominate
-from dominate.tags import div, meta, p, span
+from dominate.tags import meta, p, pre, span, style
 
 from .ref import Ref, SubDoc
 from .word import Word
@@ -64,7 +64,7 @@ class Treebank(ABC):
         yield list(takewhile(lambda s: s.subdoc != self.end, sentences_iter))
 
     def _body(self, subdoc: SubDoc | None = None) -> Any:
-        with div(
+        with pre(
             cls=f"greek corpus {self.meta.format} syntax", data_urn=self.meta.urn
         ) as body:
             for pg in (
@@ -88,6 +88,34 @@ class Treebank(ABC):
         with doc.head: # type: ignore
             meta(name="title", content=self.meta.title)
             meta(name="author", content=self.meta.author)
+            style("""
+            @import url('https://fonts.googleapis.com/css2?family=Alegreya&display=swap');
+
+            body {
+                max-width: 65ch;
+                margin: 4em auto;
+                line-height: 1.5;
+                font-size: 1.2em;
+                color: #333;
+            }
+
+            pre {
+                font-family: 'Alegreya', serif;
+            }
+
+            p {
+                white-space: normal;
+            }
+
+            .subdoc { padding-right: 1em; }
+
+            .verb { font-weight: bold;}
+            .n { color: #0d9488; }
+            .a { color: #2563eb; }
+            .g { color: #7c3aed; }
+            .d { color: #db2777; }
+            .v { color: #ca8a04; }
+            """)
         with doc:
             self._body(subdoc)
 

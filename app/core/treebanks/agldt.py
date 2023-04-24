@@ -8,7 +8,7 @@ from lxml import etree
 
 from .ref import Ref, RefRange, SubDoc
 from .treebank import Metadata, Sentence, Treebank
-from .word import Word, parse_word
+from .word import POS, Word, parse_word
 
 
 class AgldTreebank(Treebank):
@@ -69,9 +69,14 @@ class AgldTreebank(Treebank):
 
     def render_sentence(self, sentence: Sentence):
         def word(w: Word, next: Word | None = None):
+            whitespace = " " 
+            if next and next.form in [".", ",", ";", ":", "·", "]", ")"]:
+                whitespace = ""
+            if w.form in ["[", "("]:
+                whitespace = ""
             span(
-                f'{w.form}{"" if next and next.form in "".split(".,;:·") else " "}',
-                cls=f"{w.pos if w.pos == 'verb' else ''} {w.case or ''}",
+                f'{w.form}{whitespace}',
+                cls=f"{w.pos if w.pos in [POS.verb] else ''} {str(w.case)[0] or ''}",
                 data_id=str(w.id),
                 data_head=str(w.head),
                 data_lemma=w.lemma,

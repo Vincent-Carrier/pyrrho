@@ -1,6 +1,7 @@
 import re
 from dataclasses import dataclass
 from enum import StrEnum, auto
+from typing import Self
 
 from app.core.utils import at
 
@@ -27,8 +28,14 @@ class POS(StrEnum):
     exclamation = auto()
     punctuation = auto()
 
+    @classmethod
+    def parse(cls, pos: str | None) -> Self | None:
+        if pos is None:
+            return None
+        return _pos_tags.get(pos)  # type: ignore
 
-pos_tags = {
+
+_pos_tags = {
     "n": POS.noun,
     "v": POS.verb,
     "t": POS.participle,
@@ -54,8 +61,14 @@ class Case(StrEnum):
     genitive = auto()
     vocative = auto()
 
+    @classmethod
+    def parse(cls, case: str | None) -> Self | None:
+        if case is None:
+            return None
+        return _case_tags.get(case)  # type: ignore
 
-case_tags = {
+
+_case_tags = {
     "n": Case.nominative,
     "a": Case.accusative,
     "d": Case.dative,
@@ -83,8 +96,8 @@ def parse_word(attr: dict) -> Word | None:
         return None
 
     tags = attr.get("postag")
-    pos = at(tags, 0)
-    case = at(tags, 7)
+    pos = POS.parse(at(tags, 0))
+    case = Case.parse(at(tags, 7))
 
     location = None
     if attr.get("cite"):
@@ -98,7 +111,7 @@ def parse_word(attr: dict) -> Word | None:
     lemma = attr.get("lemma")
     if lemma:
         lemma = re.sub(r"\d+$", "", lemma)
-    definition = "" # TODO
+    definition = ""  # TODO
     # if definition:
     #     definition = re.sub(r"\W+$", "", definition)
 
