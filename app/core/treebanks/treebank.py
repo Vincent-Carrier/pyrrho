@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generator, Generic, Literal, Type, TypeVar
+from itertools import takewhile
+from typing import Any, Generator, Literal, Type
 
-from boltons.iterutils import split_iter
-from dominate.tags import p, pre, span
+import dominate
+from dominate.tags import div, meta, p, span
 
-from .ref import Ref, RefRange, SubDoc
+from .ref import Ref, SubDoc
 from .word import Word
 
 
@@ -56,21 +57,39 @@ class Treebank(ABC):
     def render_sentence(self, sentence: Sentence):
         pass
 
-    def paragraphs(self) -> Generator[Paragraph, None, None]:
-        yield from split_iter(self.sentences(), lambda a, b: a.subdoc != b.subdoc)
+    def paragraphs(
+        self, sentences: list[Sentence] | None
+    ) -> Generator[Paragraph, None, None]:
+        sentences_iter = self.sentences() if sentences is None else iter(sentences)
+        yield list(takewhile(lambda s: s.subdoc != self.end, sentences_iter))
 
-    def render(self, range: RefRange | None = None) -> str:
-        with pre(
-            cls=f"greek {self.meta.format} syntax", data_urn=self.meta.urn
-        ) as html:
-            for pg in self.paragraphs():
+    def _body(self, subdoc: SubDoc | None = None) -> Any:
+        with div(
+            cls=f"greek corpus {self.meta.format} syntax", data_urn=self.meta.urn
+        ) as body:
+            for pg in (
+                self.paragraphs(None)
+                if subdoc is None
+                else self.paragraphs(self[subdoc])
+            ):
                 with p():
                     span(
-                        subdoc := pg[0].subdoc,
-                        data_subdoc=subdoc,
+                        ref := str(pg[0].subdoc),
+                        data_subdoc=ref,
                         cls="subdoc",
                     )
                     for s in pg:
                         self.render_sentence(s)
 
-        return html.render()  # type: ignore
+        return body
+    
+    def render(self, subdoc: SubDoc | None = None) -> str:
+        doc = dominate.document(title=self.meta.title)
+        with doc.head: # type: ignore
+            meta(name="title", content=self.meta.title)
+            meta(name="author", content=self.meta.author)
+        with doc:
+            self._body(subdoc)
+
+        return doc.render()
+

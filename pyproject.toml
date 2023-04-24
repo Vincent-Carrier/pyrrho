@@ -17,19 +17,17 @@ requests = "^2.28.2"
 pyconll = "^3.1.0"
 python-dotenv = "^1.0.0"
 
-
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
 jupyter = "^1.0.0"
 pytest = "^7.3.1"
 mypy = "^1.2.0"
 lxml-stubs = "^0.4.0"
+better-exceptions = "^0.3.3"
 
 [tool.mypy]
 warn_unused_configs = true
 warn_redundant_casts = true
-warn_unused_ignores = true
-warn_return_any = true
 warn_unreachable = true
 warn_no_return = true
 plugins = ["pydantic.mypy"]

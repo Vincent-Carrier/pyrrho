@@ -12,7 +12,7 @@ from .word import Word, parse_word
 
 
 class AgldTreebank(Treebank):
-    root: etree._Element
+    body: etree._Element
     gorman: bool
     _subdocs: list[Ref | RefRange] = []
 
@@ -27,16 +27,22 @@ class AgldTreebank(Treebank):
         self.gorman = gorman
 
         tree = etree.parse(f)
-        self.root = tree.getroot()
-        self.meta.urn = self.root.attrib.get("cts")
+        root = tree.getroot()
+        if gorman:
+            self.body = root
+        else:
+            self.body = root.find(".//body")  # type: ignore
+        assert self.body is not None
+
+        self.meta.urn = root.attrib.get("cts")
         if self.meta.urn is None:
-            self.meta.urn = self.root.find(".//sentence").attrib.get("document_id")  # type: ignore
+            self.meta.urn = self.body.find(".//sentence").attrib.get("document_id")  # type: ignore
         if self.meta.urn:
             self.meta.urn = self.normalize_urn(self.meta.urn)
 
         self._subdocs = [
-            self._parse_subdoc(subdoc)
-            for sentence in self.root.findall(".//sentence")
+            self.parse_subdoc(subdoc)
+            for sentence in self.body.findall(".//sentence")
             if (_subdoc := sentence.attrib.get("subdoc")) is not None
             and (subdoc := str(_subdoc)) != ""
         ]
@@ -44,7 +50,7 @@ class AgldTreebank(Treebank):
     def __getitem__(self, ref: SubDoc | str) -> list[Sentence]:
         match ref:
             case str():
-                return self[self._parse_subdoc(ref)]
+                return self[self.parse_subdoc(ref)]
             case RefRange(start, end):
                 # TODO: make this more efficient / robust
                 lstripped = dropwhile(lambda s: s.subdoc != start, self.sentences())
@@ -52,19 +58,19 @@ class AgldTreebank(Treebank):
                 return list(rstripped)
             case Ref():
                 if ref in self._subdocs:
-                    el = self.root.find(
+                    el = self.body.find(
                         f".//sentence[@subdoc='{ref}']"
                     )  # TODO: paragraphs, etc.
-                    if el:
+                    if el is not None:
                         return [self.sentence(el)]  # type: ignore
                 return []
             case _:
                 raise TypeError(f"Cannot get {ref} from {self}")
 
     def render_sentence(self, sentence: Sentence):
-        def tag(w: Word, next: Word | None = None):
+        def word(w: Word, next: Word | None = None):
             span(
-                w.form + "" if next and next.form in "".split(".,;:·") else " ",
+                f'{w.form}{"" if next and next.form in "".split(".,;:·") else " "}',
                 cls=f"{w.pos if w.pos == 'verb' else ''} {w.case or ''}",
                 data_id=str(w.id),
                 data_head=str(w.head),
@@ -78,21 +84,24 @@ class AgldTreebank(Treebank):
         else:
             with span(cls="sentence"):
                 for w, next in pairwise(sentence):
-                    tag(w, next)
-                tag(sentence[-1])
+                    word(w, next)
+                word(sentence[-1])
 
     def normalize_urn(self, urn: str | bytes) -> str:
         return re.search(r"^(urn:cts:greekLit:tlg\d{4}.tlg\d{3}).*", str(urn)).group(1)  # type: ignore
 
     def sentences(self) -> Generator[Sentence, None, None]:
-        yield from (self.sentence(el) for el in self.root.findall(".//sentence"))  # type: ignore
+        yield from (self.sentence(el) for el in self.body.findall(".//sentence"))  # type: ignore
 
     def sentence(self, el: Element) -> Sentence:
         words: list[Word] = [
             w for token in el if (w := parse_word(token.attrib)) is not None
         ]
-        return Sentence(words, self._parse_subdoc(el.attrib["subdoc"]))
+        return Sentence(words, self.parse_subdoc(el.attrib["subdoc"]))
 
-
-    def _parse_subdoc(self, subdoc: str) -> SubDoc:
-        return RefRange.parse(self.ref_cls, subdoc) if "-" in subdoc else self.ref_cls.parse(subdoc)
+    def parse_subdoc(self, subdoc: str) -> SubDoc:
+        return (
+            RefRange.parse(self.ref_cls, subdoc)
+            if "-" in subdoc
+            else self.ref_cls.parse(subdoc)
+        )
