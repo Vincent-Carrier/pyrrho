@@ -2,8 +2,9 @@ import asyncio
 
 from aredis_om import get_redis_connection
 
-from app import init
 from app.core.langs.ag.lexicon import seed_lsj
+
+from .app.main import init
 
 
 async def main():
