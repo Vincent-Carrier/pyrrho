@@ -12,15 +12,12 @@ async def get_index(lang: str):
         case "ag":
             return {
                 "treebanks": [
-                    {
-                        "slug": slug,
-                        "title": (tb := entry()).meta.title,
-                        "author": tb.meta.author,
-                        "format": tb.meta.format,
-                    }
+                    {"slug": slug, "title": entry.title, "author": entry.author}
                     for slug, entry in corpus.items()
                 ]
             }
+        case _:
+            return HTTPException(status_code=404, detail=f"Unknown language {lang}")
 
 
 @router.get("/{lang}/{slug}", response_class=HTMLResponse)

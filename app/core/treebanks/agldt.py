@@ -6,9 +6,10 @@ from xml.etree.ElementTree import Element
 from dominate.tags import span
 from lxml import etree
 
+from ..utils import at
 from .ref import Ref, RefRange, SubDoc
 from .treebank import Metadata, Sentence, Treebank
-from .word import POS, Word, parse_word
+from .word import POS, Case, Word
 
 
 class AgldTreebank(Treebank):
@@ -76,11 +77,10 @@ class AgldTreebank(Treebank):
                 whitespace = ""
             span(
                 f'{w.form}{whitespace}',
-                cls=f"{w.pos if w.pos in [POS.verb] else ''} {str(w.case)[0] or ''}",
+                cls=f"{w.pos if w.pos in [POS.verb] else ''} {str(w.case) or ''}",
                 data_id=str(w.id),
                 data_head=str(w.head),
                 data_lemma=w.lemma,
-                data_def=w.definition,
                 data_flags=w.flags,
             )
 
@@ -100,7 +100,7 @@ class AgldTreebank(Treebank):
 
     def sentence(self, el: Element) -> Sentence:
         words: list[Word] = [
-            w for token in el if (w := parse_word(token.attrib)) is not None
+            w for token in el if (w := _word(token.attrib)) is not None
         ]
         return Sentence(words, self.parse_subdoc(el.attrib["subdoc"]))
 
@@ -110,3 +110,31 @@ class AgldTreebank(Treebank):
             if "-" in subdoc
             else self.ref_cls.parse(subdoc)
         )
+
+
+def _word(attr: dict) -> Word | None:
+    if attr.get("insertion_id") is not None:
+        return None
+
+    tags = attr.get("postag")
+    pos = POS.parse_tag(at(tags, 0))
+    case = Case.parse_tag(at(tags, 7))
+
+    lemma = attr.get("lemma")
+    if lemma:
+        lemma = re.sub(r"\d+$", "", lemma)
+
+    def parse_int(s: str | None) -> int | None:
+        if s is None:
+            return None
+        return int(s) if s != "" else None
+
+    return Word(
+        id=parse_int(attr.get("id")),
+        head=parse_int(attr.get("head")),
+        form=attr["form"],
+        lemma=lemma,
+        pos=pos,
+        case=case,
+        flags=tags,
+    )

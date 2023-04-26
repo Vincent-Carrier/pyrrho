@@ -2,18 +2,10 @@ import logging
 from os import environ as env
 
 import uvicorn
-from aredis_om import Migrator
-from dotenv import load_dotenv
 from fastapi import FastAPI
 
 from .logger import get_logger_config
 from .routers import corpus, definitions
-
-
-async def init():
-    load_dotenv()
-    await Migrator().run()
-
 
 app = FastAPI()
 
@@ -34,11 +26,6 @@ def langs():
             {"id": "ag", "name": "Ancient Greek"},
         ]
     }
-
-
-@app.on_event("startup")
-async def startup():
-    await init()
 
 
 if __name__ == "__main__":

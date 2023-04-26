@@ -60,6 +60,7 @@ class Treebank(ABC):
     def paragraphs(
         self, sentences: list[Sentence] | None
     ) -> Generator[Paragraph, None, None]:
+        # TODO: make this actually work
         sentences_iter = self.sentences() if sentences is None else iter(sentences)
         yield list(takewhile(lambda s: s.subdoc != self.end, sentences_iter))
 
@@ -99,22 +100,18 @@ class Treebank(ABC):
                 color: #333;
             }
 
-            pre {
-                font-family: 'Alegreya', serif;
-            }
+            pre { font-family: 'Alegreya', serif; }
 
-            p {
-                white-space: normal;
-            }
+            p { white-space: normal; }
 
             .subdoc { padding-right: 1em; }
 
-            .verb { font-weight: bold;}
-            .n { color: #0d9488; }
-            .a { color: #2563eb; }
-            .g { color: #7c3aed; }
-            .d { color: #db2777; }
-            .v { color: #ca8a04; }
+            .verb { font-weight: bold; }
+            .nominative { color: #0d9488; }
+            .accusative { color: #2563eb; }
+            .genitive { color: #7c3aed; }
+            .dative { color: #db2777; }
+            .vocative { color: #ca8a04; }
             """)
         with doc:
             self._body(subdoc)
