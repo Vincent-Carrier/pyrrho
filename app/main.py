@@ -3,6 +3,7 @@ from os import environ as env
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
 from .logger import get_logger_config
 from .routers import corpus, definitions
@@ -12,6 +13,7 @@ app = FastAPI()
 app.include_router(corpus.router, prefix="/corpus", tags=["corpus"])
 app.include_router(definitions.router, prefix="/definitions", tags=["definitions"])
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
 async def root():

@@ -1,4 +1,5 @@
 import re
+import shelve
 from itertools import dropwhile, pairwise, takewhile
 from typing import Generator, Type
 from xml.etree.ElementTree import Element
@@ -82,6 +83,7 @@ class AgldTreebank(Treebank):
                 data_head=str(w.head),
                 data_lemma=w.lemma,
                 data_flags=w.flags,
+                data_def=w.definition,
             )
 
         if self.meta.format == "verse":
@@ -112,8 +114,10 @@ class AgldTreebank(Treebank):
         )
 
 
+lsj = shelve.open("data/ag/lsj") # TODO
+
 def _word(attr: dict) -> Word | None:
-    if attr.get("insertion_id") is not None:
+    if attr.get("insertion_id") is not None: # TODO
         return None
 
     tags = attr.get("postag")
@@ -137,4 +141,5 @@ def _word(attr: dict) -> Word | None:
         pos=pos,
         case=case,
         flags=tags,
+        definition=lsj.get(lemma) if lemma else None,
     )

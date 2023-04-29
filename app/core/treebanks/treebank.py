@@ -4,7 +4,7 @@ from itertools import takewhile
 from typing import Any, Generator, Literal, Type
 
 import dominate
-from dominate.tags import meta, p, pre, span, style
+from dominate.tags import link, meta, p, pre, script, span, style
 
 from .ref import Ref, SubDoc
 from .word import Word
@@ -89,32 +89,13 @@ class Treebank(ABC):
         with doc.head: # type: ignore
             meta(name="title", content=self.meta.title)
             meta(name="author", content=self.meta.author)
-            style("""
-            @import url('https://fonts.googleapis.com/css2?family=Alegreya&display=swap');
-
-            body {
-                max-width: 65ch;
-                margin: 4em auto;
-                line-height: 1.5;
-                font-size: 1.2em;
-                color: #333;
-            }
-
-            pre { font-family: 'Alegreya', serif; }
-
-            p { white-space: normal; }
-
-            .subdoc { padding-right: 1em; }
-
-            .verb { font-weight: bold; }
-            .nominative { color: #0d9488; }
-            .accusative { color: #2563eb; }
-            .genitive { color: #7c3aed; }
-            .dative { color: #db2777; }
-            .vocative { color: #ca8a04; }
-            """)
+            link(rel="stylesheet", href="/static/styles.css")
         with doc:
             self._body(subdoc)
+            script(src="https://cdnjs.cloudflare.com/ajax/libs/cash/8.1.5/cash.min.js")
+            script(src="https://unpkg.com/@popperjs/core@2")
+            script(src="https://unpkg.com/tippy.js@6")
+            script(src="/static/reader.js", type="module")
 
         return doc.render()
 

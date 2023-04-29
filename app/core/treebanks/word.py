@@ -89,3 +89,4 @@ class Word:
     pos: POS | None
     case: Case | None
     flags: str | None = None
+    definition: str | None = None
