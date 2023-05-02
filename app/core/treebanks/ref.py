@@ -2,6 +2,8 @@ from abc import ABC
 from dataclasses import astuple, dataclass
 from typing import Self, Type
 
+from ordered_enum import OrderedEnum  # type: ignore
+
 
 @dataclass(order=True, frozen=True)
 class Ref(ABC):
@@ -52,6 +54,10 @@ class RefRange:
 SubDoc = Ref | RefRange
 
 
+def parse_subdoc(ref_cls, subdoc: str) -> SubDoc:
+    return RefRange.parse(ref_cls, subdoc) if "-" in subdoc else ref_cls.parse(subdoc)
+
+
 @dataclass(order=True, frozen=True, slots=True)
 class BCV(Ref):
     book: int
@@ -68,3 +74,47 @@ class CV(Ref):
 @dataclass(order=True, frozen=True, slots=True)
 class Line(Ref):
     line: int
+
+
+class NT_Book(OrderedEnum):
+    MATT = "MATT"
+    MARK = "MARK"
+    LUKE = "LUKE"
+    JOHN = "JOHN"
+    ACTS = "ACTS"
+    ROM = "ROM"
+    COR1 = "1COR"
+    COR2 = "2COR"
+    GAL = "GAL"
+    EPH = "EPH"
+    PHIL = "PHIL"
+    COL = "COL"
+    THESS1 = "1THESS"
+    THESS2 = "2THESS"
+    TIM1 = "1TIM"
+    TIM2 = "2TIM"
+    TIT = "TIT"
+    PHILEM = "PHILEM"
+    HEB = "HEB"
+    JAS = "JAS"
+    PET1 = "1PET"
+    JOHN3 = "3JOHN"
+    JUDE = "JUDE"
+    REV = "REV"
+
+
+@dataclass(order=True, frozen=True, slots=True)
+class NT_Ref(Ref):
+    book: NT_Book
+    chapter: int
+    verse: int | None = None
+
+    def __str__(self):
+        cv = [str(x) for x in [self.chapter, self.verse] if x is not None]
+        return f"{self.book.value}_{'.'.join(cv)}"
+
+    @classmethod
+    def parse(cls, ref: str) -> Self:
+        b, cv = ref.split("_")
+        c, v = cv.split(".")
+        return cls(NT_Book(b), int(c), int(v))

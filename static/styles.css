@@ -13,6 +13,7 @@ pre { font-family: 'Alegreya', serif; }
 p { white-space: normal; }
 
 .subdoc { padding-right: 1em; }
+p .sentence:not(:last-child)::after { content: '  —   '; }
 
 .verb { font-weight: bold; }
 .nominative { color: #0d9488; }

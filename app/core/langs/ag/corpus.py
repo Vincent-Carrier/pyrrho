@@ -1,47 +1,34 @@
 from pathlib import Path
-from typing import NamedTuple
 
-from app.core.treebanks.agldt import AgldTreebank
-from app.core.treebanks.ref import BCV, Ref
-from app.core.treebanks.treebank import Metadata
+from ...treebanks.nt import NT_Treebank
+from ...treebanks.perseus import PerseusTreebank
+from ...treebanks.ref import BCV
 
 root = Path("data/ag")
 
 
-class CorpusEntry(NamedTuple):
-    path: str
-    title: str
-    author: str
-    ref_type: type[Ref]
-    gorman: bool = False
-
-    def __call__(self) -> AgldTreebank:
-        return AgldTreebank(
-            str(root / self.path),
-            Metadata(title=self.title, author=self.author),
-            ref_cls=self.ref_type,
-            gorman=self.gorman,
-        )
-
-
 corpus = {
-    "histories": CorpusEntry(
-        "perseus/2.1/thucydides.xml",
+    "histories": lambda: PerseusTreebank(
+        root / "perseus/2.1/thucydides.xml",
+        ref_cls=BCV,
         title="Histories, Book 1",
         author="Thucydides",
-        ref_type=BCV,
     ),
-    "historiae": CorpusEntry(
-        "perseus/2.1/herodotus.xml",
+    "historiae": lambda: PerseusTreebank(
+        root / "perseus/2.1/herodotus.xml",
+        ref_cls=BCV,
         title="Historiae, Book 1",
         author="Herodotus",
-        ref_type=BCV,
     ),
-    "anabasis": CorpusEntry(
-        "vgorman/Xen_Anab_book_1.1-5.xml",
+    "anabasis": lambda: PerseusTreebank(
+        root / "vgorman/Xen_Anab_book_1.1-5.xml",
+        ref_cls=BCV,
         title="Anabasis, Book 1",
         author="Xenophon",
-        ref_type=BCV,
         gorman=True,
+    ),
+    "nt": lambda: NT_Treebank(
+        root / "new-testament.conllu",
+        title="New Testament",
     ),
 }

@@ -1,10 +1,9 @@
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
-from itertools import takewhile
 from typing import Any, Generator, Literal, Type
 
 import dominate
-from dominate.tags import link, meta, p, pre, script, span, style
+from dominate.tags import link, meta, p, pre, script, span
 
 from .ref import Ref, SubDoc
 from .word import Word
@@ -38,12 +37,13 @@ class Metadata:
     format: Format = "prose"
 
 
-@dataclass
-class Treebank(ABC):
+class Treebank(metaclass=ABCMeta):
     meta: Metadata
     ref_cls: Type[Ref]
-    start: Ref | None = None
-    end: Ref | None = None
+
+    def __init__(self, ref_cls: Type[Ref], **kwargs) -> None:
+        self.meta = Metadata(**kwargs)
+        self.ref_cls = ref_cls
 
     @abstractmethod
     def __getitem__(self, ref: SubDoc) -> list[Sentence]:
@@ -61,8 +61,7 @@ class Treebank(ABC):
         self, sentences: list[Sentence] | None
     ) -> Generator[Paragraph, None, None]:
         # TODO: make this actually work
-        sentences_iter = self.sentences() if sentences is None else iter(sentences)
-        yield list(takewhile(lambda s: s.subdoc != self.end, sentences_iter))
+        raise NotImplementedError
 
     def _body(self, subdoc: SubDoc | None = None) -> Any:
         with pre(
@@ -83,10 +82,10 @@ class Treebank(ABC):
                         self.render_sentence(s)
 
         return body
-    
+
     def render(self, subdoc: SubDoc | None = None) -> str:
         doc = dominate.document(title=self.meta.title)
-        with doc.head: # type: ignore
+        with doc.head:  # type: ignore
             meta(name="title", content=self.meta.title)
             meta(name="author", content=self.meta.author)
             link(rel="stylesheet", href="/static/styles.css")
@@ -98,4 +97,3 @@ class Treebank(ABC):
             script(src="/static/reader.js", type="module")
 
         return doc.render()
-

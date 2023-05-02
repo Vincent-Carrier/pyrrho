@@ -1,6 +1,7 @@
 import re
 import shelve
 from itertools import dropwhile, pairwise, takewhile
+from pathlib import Path
 from typing import Generator, Type
 from xml.etree.ElementTree import Element
 
@@ -8,24 +9,24 @@ from dominate.tags import span
 from lxml import etree
 
 from ..utils import at
-from .ref import Ref, RefRange, SubDoc
-from .treebank import Metadata, Sentence, Treebank
+from .ref import Ref, RefRange, SubDoc, parse_subdoc
+from .treebank import Sentence, Treebank
 from .word import POS, Case, Word
 
 
-class AgldTreebank(Treebank):
+class PerseusTreebank(Treebank):
     body: etree._Element
     gorman: bool
     _subdocs: list[Ref | RefRange] = []
 
     def __init__(
         self,
-        f: str,
-        meta: Metadata,
+        f: Path,
         ref_cls: Type[Ref],
         gorman: bool = False,
+        **kwargs,
     ) -> None:
-        super().__init__(meta, ref_cls=ref_cls)
+        super().__init__(ref_cls=ref_cls, **kwargs)
         self.gorman = gorman
 
         tree = etree.parse(f)
@@ -43,7 +44,7 @@ class AgldTreebank(Treebank):
             self.meta.urn = self.normalize_urn(self.meta.urn)
 
         self._subdocs = [
-            self.parse_subdoc(subdoc)
+            parse_subdoc(self.ref_cls, subdoc)
             for sentence in self.body.findall(".//sentence")
             if (_subdoc := sentence.attrib.get("subdoc")) is not None
             and (subdoc := str(_subdoc)) != ""
@@ -52,7 +53,7 @@ class AgldTreebank(Treebank):
     def __getitem__(self, ref: SubDoc | str) -> list[Sentence]:
         match ref:
             case str():
-                return self[self.parse_subdoc(ref)]
+                return self[parse_subdoc(self.ref_cls, ref)]
             case RefRange(start, end):
                 # TODO: make this more efficient / robust
                 lstripped = dropwhile(lambda s: s.subdoc != start, self.sentences())
@@ -70,29 +71,13 @@ class AgldTreebank(Treebank):
                 raise TypeError(f"Cannot get {ref} from {self}")
 
     def render_sentence(self, sentence: Sentence):
-        def word(w: Word, next: Word | None = None):
-            whitespace = " " 
-            if next and next.form in [".", ",", ";", ":", "·", "]", ")"]:
-                whitespace = ""
-            if w.form in ["[", "("]:
-                whitespace = ""
-            span(
-                f'{w.form}{whitespace}',
-                cls=f"{w.pos if w.pos in [POS.verb] else ''} {str(w.case) or ''}",
-                data_id=str(w.id),
-                data_head=str(w.head),
-                data_lemma=w.lemma,
-                data_flags=w.flags,
-                data_def=w.definition,
-            )
-
         if self.meta.format == "verse":
             raise NotImplementedError()
         else:
             with span(cls="sentence"):
                 for w, next in pairwise(sentence):
-                    word(w, next)
-                word(sentence[-1])
+                    Word.render(w, next)
+                Word.render(sentence[-1])
 
     def normalize_urn(self, urn: str | bytes) -> str:
         return re.search(r"^(urn:cts:greekLit:tlg\d{4}.tlg\d{3}).*", str(urn)).group(1)  # type: ignore
@@ -104,25 +89,19 @@ class AgldTreebank(Treebank):
         words: list[Word] = [
             w for token in el if (w := _word(token.attrib)) is not None
         ]
-        return Sentence(words, self.parse_subdoc(el.attrib["subdoc"]))
-
-    def parse_subdoc(self, subdoc: str) -> SubDoc:
-        return (
-            RefRange.parse(self.ref_cls, subdoc)
-            if "-" in subdoc
-            else self.ref_cls.parse(subdoc)
-        )
+        return Sentence(words, parse_subdoc(self.ref_cls, el.attrib["subdoc"]))
 
 
-lsj = shelve.open("data/ag/lsj") # TODO
+lsj = shelve.open("data/ag/lsj")  # TODO
+
 
 def _word(attr: dict) -> Word | None:
-    if attr.get("insertion_id") is not None: # TODO
+    if attr.get("insertion_id") is not None:  # TODO
         return None
 
     tags = attr.get("postag")
-    pos = POS.parse_tag(at(tags, 0))
-    case = Case.parse_tag(at(tags, 7))
+    pos = POS.parse_agldt(at(tags, 0))
+    case = Case.parse_agldt(at(tags, 7))
 
     lemma = attr.get("lemma")
     if lemma:

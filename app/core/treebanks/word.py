@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from enum import StrEnum, auto
 from typing import Self
 
+from dominate.tags import span
+
 
 class POS(StrEnum):
     noun = auto()
@@ -20,10 +22,16 @@ class POS(StrEnum):
     punctuation = auto()
 
     @classmethod
-    def parse_tag(cls, pos: str | None) -> Self | None:
+    def parse_agldt(cls, pos: str | None) -> Self | None:
         if pos is None:
             return None
-        return _pos_tags.get(pos)  # type: ignore
+        return _pos_agldt.get(pos)  # type: ignore
+    
+    @classmethod
+    def parse_conll(cls, pos: str | None) -> Self | None:
+        if pos is None:
+            return None
+        return _pos_conll.get(pos)  # type: ignore
 
 
 class Case(StrEnum):
@@ -34,17 +42,17 @@ class Case(StrEnum):
     vocative = auto()
 
     @classmethod
-    def parse_tag(cls, case: str | None) -> Self | None:
+    def parse_agldt(cls, case: str | None) -> Self | None:
         if case is None:
             return None
-        return _case_tags.get(case)  # type: ignore
+        return _case_agldt.get(case)  # type: ignore
 
     @classmethod
-    def parse_feat(cls, case: str) -> Self | None:
-        return _case_feats.get(case)  # type: ignore
+    def parse_conll(cls, case: str) -> Self | None:
+        return _case_conll.get(case)  # type: ignore
+    
 
-
-_pos_tags = {
+_pos_agldt = {
     "n": POS.noun,
     "v": POS.verb,
     "t": POS.participle,
@@ -62,7 +70,27 @@ _pos_tags = {
     "-": None,
 }
 
-_case_tags = {
+_pos_conll = {
+    "ADJ": POS.adjective,
+    "ADP": POS.preposition,
+    "ADV": POS.adverb,
+    "AUX": POS.verb,
+    "CCONJ": POS.conjunction,
+    "DET": POS.article,
+    "INTJ": POS.interjection,
+    "NOUN": POS.noun,
+    "NUM": POS.numeral,
+    "PART": POS.particle,
+    "PRON": POS.pronoun,
+    "PROPN": POS.noun,
+    "PUNCT": POS.punctuation,
+    "SCONJ": POS.conjunction,
+    "SYM": None,
+    "VERB": POS.verb,
+    "X": None,
+}
+
+_case_agldt = {
     "n": Case.nominative,
     "a": Case.accusative,
     "d": Case.dative,
@@ -71,7 +99,7 @@ _case_tags = {
     "-": None,
 }
 
-_case_feats = {
+_case_conll = {
     "Nom": Case.nominative,
     "Acc": Case.accusative,
     "Dat": Case.dative,
@@ -90,3 +118,21 @@ class Word:
     case: Case | None
     flags: str | None = None
     definition: str | None = None
+
+    
+    @classmethod
+    def render(cls, w: Self, next: Self | None = None):
+        whitespace = " "
+        if next and next.form in [".", ",", ";", ":", "·", "]", ")"]:
+            whitespace = ""
+        if w.form in ["[", "("]:
+            whitespace = ""
+        span(
+            f"{w.form}{whitespace}",
+            cls=f"{w.pos if w.pos in [POS.verb] else ''} {str(w.case) or ''}",
+            data_id=str(w.id),
+            data_head=str(w.head),
+            data_lemma=w.lemma,
+            data_flags=w.flags,
+            data_def=w.definition,
+        )
