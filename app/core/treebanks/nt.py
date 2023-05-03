@@ -68,12 +68,12 @@ class NT_Treebank(ConLL_Treebank):
 
     @span(cls="sentence")
     def render_sentence(self, sentence: Sentence):
-        verse = cast(int, sentence[0].subdoc.verse)
+        v = 0
         for w, next in pairwise(sentence):
-            word_verse = cast(int, w.subdoc.verse)  # type: ignore
-            if word_verse != verse:
+            verse: int = w.subdoc.verse  # type: ignore
+            if verse != v:
                 span(verse, cls="verse")
-                verse = word_verse
+                v = verse
             Word.render(w, next)
         Word.render(sentence[-1])
 

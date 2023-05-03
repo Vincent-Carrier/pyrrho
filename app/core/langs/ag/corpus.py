@@ -1,13 +1,15 @@
 from pathlib import Path
+from typing import Callable
 
 from ...treebanks.nt import NT_Treebank
 from ...treebanks.perseus import PerseusTreebank
 from ...treebanks.ref import BCV
+from ...treebanks.treebank import Treebank
 
 root = Path("data/ag")
 
 
-corpus = {
+corpus: dict[str, Callable[[], Treebank]] = {
     "histories": lambda: PerseusTreebank(
         root / "perseus/2.1/thucydides.xml",
         ref_cls=BCV,

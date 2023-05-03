@@ -118,7 +118,7 @@ tippy('[data-lemma]', {
       d.lemma
     }" target="_blank">${d.lemma}</a><br />
     ${d.def ? `${d.def}<br />` : ''}
-    <div>${flagsToString(d.flags)}</div>`
+    ${d.flags ? `<div>${flagsToString(d.flags)}</div>` : ''}`
   },
   allowHTML: true,
   interactive: true,

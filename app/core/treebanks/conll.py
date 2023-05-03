@@ -1,3 +1,4 @@
+import shelve
 from pathlib import Path
 from typing import Any, Generator, Type
 
@@ -7,6 +8,7 @@ from .ref import Ref
 from .treebank import Sentence, Treebank
 from .word import POS, Case, Word
 
+lsj = shelve.open("data/ag/lsj")
 
 class ConLL_Treebank(Treebank):
     _conll: Any
@@ -34,6 +36,7 @@ class ConLL_Treebank(Treebank):
             head=w.head,
             form=w.form,
             lemma=w.lemma,
+            definition=lsj.get(w.lemma),
             pos=POS.parse_conll(w.upos),
             case=kase,
         )
