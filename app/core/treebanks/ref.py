@@ -1,5 +1,6 @@
 from abc import ABC
 from dataclasses import astuple, dataclass
+from itertools import takewhile
 from typing import Self, Type
 
 from ordered_enum import OrderedEnum  # type: ignore
@@ -107,14 +108,22 @@ class NT_Book(OrderedEnum):
 class NT_Ref(Ref):
     book: NT_Book
     chapter: int
-    verse: int | None = None
+    verse: int # we use 0 to indicate a chapter ref, so that we get implicit ordering
 
     def __str__(self):
-        cv = [str(x) for x in [self.chapter, self.verse] if x is not None]
-        return f"{self.book.value}_{'.'.join(cv)}"
+        if self.verse != 0:
+            return f"{self.book.value}_{self.chapter}.{self.verse}"
+        else:
+            return f"{self.book.value}_{self.chapter}"
+
 
     @classmethod
     def parse(cls, ref: str) -> Self:
         b, cv = ref.split("_")
-        c, v = cv.split(".")
-        return cls(NT_Book(b), int(c), int(v))
+        if "." in cv:
+            c, v = cv.split(".")
+            return cls(NT_Book(b), int(c), int(v))
+        else:
+            return cls(NT_Book(b), int(cv), 0)
+
+    # TODO __contains__

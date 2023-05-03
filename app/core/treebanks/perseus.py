@@ -5,12 +5,14 @@ from pathlib import Path
 from typing import Generator, Type
 from xml.etree.ElementTree import Element
 
-from dominate.tags import span
+from dominate.tags import p, span
 from lxml import etree
+
+from app.core.treebanks.ref import SubDoc
 
 from ..utils import at
 from .ref import Ref, RefRange, SubDoc, parse_subdoc
-from .treebank import Sentence, Treebank
+from .treebank import Paragraph, Sentence, Treebank
 from .word import POS, Case, Word
 
 
@@ -69,6 +71,28 @@ class PerseusTreebank(Treebank):
                 return []
             case _:
                 raise TypeError(f"Cannot get {ref} from {self}")
+            
+    def paragraphs(
+        self, sentences: list[Sentence] | None
+    ) -> Generator[Paragraph, None, None]:
+        # TODO: make this actually work
+        raise NotImplementedError
+
+            
+    def render_body(self, subdoc: SubDoc | None = None):
+        for pg in (
+            self.paragraphs(None)
+            if subdoc is None
+            else self.paragraphs(self[subdoc])
+        ):
+            with p():
+                span(
+                    ref := str(pg[0].subdoc),
+                    data_subdoc=ref,
+                    cls="subdoc",
+                )
+                for s in pg:
+                    self.render_sentence(s)
 
     def render_sentence(self, sentence: Sentence):
         if self.meta.format == "verse":

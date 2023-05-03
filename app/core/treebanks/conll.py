@@ -3,8 +3,8 @@ from typing import Any, Generator, Type
 
 import pyconll
 
-from .ref import Ref, parse_subdoc
-from .treebank import Metadata, Sentence, Treebank
+from .ref import Ref
+from .treebank import Sentence, Treebank
 from .word import POS, Case, Word
 
 
@@ -19,25 +19,21 @@ class ConLL_Treebank(Treebank):
     ) -> None:
         super().__init__(ref_cls=ref_cls, **kwargs)
         self._conll = pyconll.load_from_file(str(f))
-        
-    
-    def sentences(self) -> Generator[Sentence, None, None]:
-        for sentence in self._conll:
+
+    def sentences(self, start=0, end=-1) -> Generator[Sentence, None, None]:
+        for sentence in self._conll[start:end]:
             yield Sentence(
-                words=[_word(w) for w in sentence],
-                subdoc=parse_subdoc(self.ref_cls, sentence.id),
+                words=[self.word(w) for w in sentence],
             )
 
-
-    def render_sentence(self, sentence: Sentence):
-        pass
-
-def _word(w: Any) -> Word:
-    return Word(
-        id=w.id,
-        head=w.head,
-        form=w.form,
-        lemma=w.lemma,
-        pos=POS.parse_conll(w.upos),
-        case=Case.parse_conll(w.feats.get("Case"))
-    )
+    def word(self, w: Any) -> Word:
+        kase = w.feats.get("Case")
+        kase = kase and Case.parse_conll(list(kase)[0])
+        return Word(
+            id=w.id,
+            head=w.head,
+            form=w.form,
+            lemma=w.lemma,
+            pos=POS.parse_conll(w.upos),
+            case=kase,
+        )

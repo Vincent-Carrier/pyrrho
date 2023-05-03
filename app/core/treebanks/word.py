@@ -4,6 +4,9 @@ from typing import Self
 
 from dominate.tags import span
 
+from ..utils import cx
+from .ref import SubDoc
+
 
 class POS(StrEnum):
     noun = auto()
@@ -118,6 +121,7 @@ class Word:
     case: Case | None
     flags: str | None = None
     definition: str | None = None
+    subdoc: SubDoc | None = None
 
     
     @classmethod
@@ -129,7 +133,7 @@ class Word:
             whitespace = ""
         span(
             f"{w.form}{whitespace}",
-            cls=f"{w.pos if w.pos in [POS.verb] else ''} {str(w.case) or ''}",
+            cls=cx(w.case, w.pos if w.pos == POS.verb else None),
             data_id=str(w.id),
             data_head=str(w.head),
             data_lemma=w.lemma,
