@@ -63,17 +63,18 @@ class NT_Treebank(ConLL_Treebank):
         assert ref.verse == 0
         span(ref.chapter, cls="chapter")
         sentences = self[ref]
+        prev_sentence = sentences[0]
         for s in sentences:
-            self.render_sentence(s)
+            self.render_sentence(s, prev_sentence[-1].subdoc.verse)
+            prev_sentence = s
 
     @span(cls="sentence")
-    def render_sentence(self, sentence: Sentence):
-        v = 0
+    def render_sentence(self, sentence: Sentence, prev_verse: int = 0):
         for w, next in pairwise(sentence):
             verse: int = w.subdoc.verse  # type: ignore
-            if verse != v:
+            if verse != prev_verse:
                 span(verse, cls="verse")
-                v = verse
+                prev_verse = verse
             Word.render(w, next)
         Word.render(sentence[-1])
 
