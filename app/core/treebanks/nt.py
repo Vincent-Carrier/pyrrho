@@ -9,7 +9,7 @@ from app.core.treebanks.ref import RefLike
 
 from .conll import ConLL_Treebank
 from .ref import NT_Ref, Ref, RefLike, RefRange
-from .render import Renderable, Token
+from .render import Renderable, Token, render
 from .word import Word
 
 
@@ -38,27 +38,32 @@ class NT_Treebank(ConLL_Treebank):
                 if r.is_chapter:
                     r = NT_Ref(b, c, 1)
                     i = bisect_left(self._refs, r, key=lambda x: x.ref)
-                    j = bisect_left(self._refs, r, key=lambda x: x.ref) + 1  # TODO
+                    j = bisect_left(self._refs, r, key=lambda x: x.ref) + 2  # TODO
                 else:
                     assert r.is_verse
                     i = bisect_left(self._refs, ref, key=lambda x: x.ref)
                     j = i + 1
-            case RefRange(start, end):
+                tb = copy(self)
+                tb.conll = self.conll[i:j]
+                tb.ref = r
+                return tb
+            case RefRange(start, end) as r:
                 i = bisect_left(self._refs, start, key=lambda x: x.ref)
                 j = bisect_right(self._refs, end, key=lambda x: x.ref)
+                tb = copy(self)
+                tb.conll = self.conll[i:j]
+                tb.ref = r
+                return tb
             case _:
                 raise TypeError(f"Cannot get {ref} from {self}")
-        tb = copy(self)
-        tb.conll = self.conll[i:j]
-        return tb
 
-    def tokens(self) -> Iterator[Renderable]:
+    def __iter__(self) -> Iterator[Renderable]:
         ref = None
         for sentence in self.conll:
             yield Token.SENTENCE_START
             for word in sentence:
                 w = self.word(word)
-                if w.ref != ref and w.ref is not None:
+                if w.ref and w.ref != ref:
                     yield cast(Ref, w.ref)
                     ref = w.ref
                 yield w

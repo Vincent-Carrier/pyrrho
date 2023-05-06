@@ -4,12 +4,15 @@ from typing import Any, Iterator, Type
 
 import pyconll
 
+from app.core.treebanks.ref import RefLike
+
 from .ref import Ref
 from .render import Renderable, Token
 from .treebank import Treebank
 from .word import POS, Case, Word
 
 lsj = shelve.open("data/ag/lsj")
+
 
 class ConLL_Treebank(Treebank):
     conll: Any
@@ -23,14 +26,17 @@ class ConLL_Treebank(Treebank):
         super().__init__(ref_cls=ref_cls, **kwargs)
         self.conll = pyconll.load_from_file(str(f))
 
-    def tokens(self) -> Iterator[Renderable]:
+    def __iter__(self) -> Iterator[Renderable]:
         # TODO: handle subdoc
         for sentence in self.conll:
             yield Token.SENTENCE_START
             yield from (self.word(w) for w in sentence)
             yield Token.SENTENCE_END
 
-    def word(self, w: Any) -> Word:
+    def __contains__(self, ref: RefLike) -> bool:
+        return True  # TODO
+
+    def word(self, w) -> Word:
         kase = w.feats.get("Case")
         kase = kase and Case.parse_conll(list(kase)[0])
         return Word(

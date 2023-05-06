@@ -1,7 +1,6 @@
 import re
 import shelve
 from copy import copy
-from itertools import dropwhile, takewhile
 from pathlib import Path
 from typing import Iterator, Self, Type
 
@@ -68,10 +67,13 @@ class PerseusTreebank(Treebank):
             case _:
                 raise TypeError(f"Cannot get {ref} from {self}")
 
+    def __contains__(self, ref: RefLike) -> bool:
+        return True  # TODO
+    
     def sentences(self) -> Iterator[etree._Element]:
         yield from self.body.findall(".//sentence")
 
-    def tokens(self) -> Iterator[Renderable]:
+    def __iter__(self) -> Iterator[Renderable]:
         # TODO: yield paragraph tokens
         for sentence in self.sentences():
             yield Token.SENTENCE_START
@@ -91,7 +93,7 @@ class PerseusTreebank(Treebank):
     #     ]
     #     return Sentence(words, self._parse_subdoc(el.attrib["subdoc"]))
 
-    def _word(self, attr: dict) -> Word | None:
+    def word(self, attr: dict) -> Word | None:
         if attr.get("insertion_id") is not None:  # TODO
             return None
 

@@ -34,20 +34,14 @@ class Treebank(metaclass=ABCMeta):
         ...
 
     @abstractmethod
-    def __contains__(self, ref: RefLike | str) -> bool:
+    def __contains__(self, ref: RefLike) -> bool:
         ...
 
     @abstractmethod
-    def __iter__(self, ref) -> Iterator[Renderable]:
+    def __iter__(self) -> Iterator[Renderable]:
         ...
 
-    def render_body(self):
-        render(iter(self))  # type: ignore
-
-    def parse_reflike(self, ref: str) -> RefLike:
-        return parse_reflike(self.ref_cls, ref)
-
-    def render(self) -> str:
+    def __str__(self) -> str:
         doc = dominate.document(title=self.meta.title)
         with doc.head:  # type: ignore
             meta(name="title", content=self.meta.title)
@@ -62,3 +56,9 @@ class Treebank(metaclass=ABCMeta):
             script(src="/static/reader.js", type="module")
 
         return doc.render()
+
+    def render_body(self):
+        render(iter(self))
+
+    def parse_reflike(self, ref: str) -> RefLike:
+        return parse_reflike(self.ref_cls, ref)

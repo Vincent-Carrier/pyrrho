@@ -25,9 +25,11 @@ router = APIRouter()
 
 
 @router.get("/{lang}/{slug}", response_class=HTMLResponse)
-async def get_treebank(lang: str, slug: str, subdoc: str | None = None):
+async def get_treebank(lang: str, slug: str, ref: str | None = None):
     if (tb := _get_treebank(slug)) is not None:
-        return tb.render(subdoc)
+        if ref is not None:
+            tb = tb[ref]
+        return str(tb)
     else:
         raise HTTPException(status_code=404, detail=f"Unknown treebank {slug}")
 
