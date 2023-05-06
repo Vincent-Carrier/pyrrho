@@ -132,11 +132,13 @@ class NT_Ref(Ref):
         assert self.chapter > 0
         return self.verse != 0
 
-    def render(self):
+    def render(self) -> span:
         if self.is_chapter:
-            span(self.chapter, cls="chapter")
+            return span(self.chapter, cls="chapter")
         elif self.is_verse:
-            span(self.verse, cls="verse")
+            return span(self.verse, cls="verse")
+        else:
+            raise ValueError("cannot render {self}")
 
     @classmethod
     def parse(cls, ref: str) -> Self:

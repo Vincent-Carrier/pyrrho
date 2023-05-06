@@ -1,12 +1,15 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
-from typing import Iterator, Literal, Self, Type
+from itertools import takewhile
+from typing import Iterable, Iterator, Literal, Self, Type
 
 import dominate
-from dominate.tags import link, meta, pre, script
+from dominate.tags import br, div, link, meta, p, pre, script, span
+from dominate.util import text
 
 from .ref import Ref, RefLike, parse_reflike
-from .render import Renderable, render
+from .render import Renderable, Token
+from .word import Word
 
 Format = Literal["prose", "verse"]
 
@@ -49,7 +52,7 @@ class Treebank(metaclass=ABCMeta):
             link(rel="stylesheet", href="/static/styles.css")
         with doc:
             with pre(cls=f"greek corpus {self.meta.format} syntax"):
-                self.render_body()
+                self.render()
             script(src="https://cdnjs.cloudflare.com/ajax/libs/cash/8.1.5/cash.min.js")
             script(src="https://unpkg.com/@popperjs/core@2")
             script(src="https://unpkg.com/tippy.js@6")
@@ -57,8 +60,34 @@ class Treebank(metaclass=ABCMeta):
 
         return doc.render()
 
-    def render_body(self):
-        render(iter(self))
+    def render(self) -> div:
+        prev: Word | None = None
+        sentence = span(cls="sentence")
+        paragraph = p()
+        container = div()
+
+        for t in iter(self):
+            match t:
+                case Word() as w:
+                    if prev and prev.form not in [".", ",", ";", ":", "·", "]", ")"]:
+                        text(" ")
+                    sentence += w.render()
+                    prev = w
+                case Ref() as r:
+                    r.render()
+                case Token.SENTENCE_START:
+                    sentence = span(cls="sentence")
+                case Token.SENTENCE_END:
+                    paragraph += sentence
+                case Token.PARAGRAPH_START:
+                    paragraph = p()
+                case Token.PARAGRAPH_END:
+                    container += paragraph
+                case Token.LINE_BREAK:
+                    br()
+                case _:
+                    raise ValueError(f"Unknown token type: {t!r}")
+        return container
 
     def parse_reflike(self, ref: str) -> RefLike:
         return parse_reflike(self.ref_cls, ref)

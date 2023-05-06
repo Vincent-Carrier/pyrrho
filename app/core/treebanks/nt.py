@@ -9,7 +9,7 @@ from app.core.treebanks.ref import RefLike
 
 from .conll import ConLL_Treebank
 from .ref import NT_Ref, Ref, RefLike, RefRange
-from .render import Renderable, Token, render
+from .render import Renderable, Token
 from .word import Word
 
 
@@ -76,4 +76,4 @@ class NT_Treebank(ConLL_Treebank):
 
 
 def _get_ref(w) -> NT_Ref:
-    return NT_Ref.parse(list(w.misc["Ref"])[0])
+    return NT_Ref.parse(next(w.misc["Ref"]))

@@ -123,8 +123,8 @@ class Word:
     definition: str | None = None
     ref: RefLike | None = None
 
-    def render(self: Self):
-        span(
+    def render(self: Self) -> span:
+        return span(
             self.form,
             cls=cx(self.case, self.pos == POS.verb and self.pos),
             data_id=str(self.id),
