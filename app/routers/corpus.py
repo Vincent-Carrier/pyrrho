@@ -29,7 +29,7 @@ async def get_treebank(lang: str, slug: str, ref: str | None = None):
     if (tb := _get_treebank(slug)) is not None:
         if ref is not None:
             tb = tb[ref]
-        return str(tb)
+        return tb.html()
     else:
         raise HTTPException(status_code=404, detail=f"Unknown treebank {slug}")
 

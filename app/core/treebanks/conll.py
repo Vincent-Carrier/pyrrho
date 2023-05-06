@@ -7,8 +7,7 @@ import pyconll
 from app.core.treebanks.ref import RefLike
 
 from .ref import Ref
-from .render import Renderable, Token
-from .treebank import Treebank
+from .treebank import Renderable, Token, Treebank
 from .word import POS, Case, Word
 
 lsj = shelve.open("data/ag/lsj")

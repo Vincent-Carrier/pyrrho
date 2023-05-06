@@ -1,16 +1,25 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
-from itertools import takewhile
-from typing import Iterable, Iterator, Literal, Self, Type
+from enum import Enum, auto
+from typing import Iterator, Literal, Self, Type, TypeAlias
 
 import dominate
-from dominate.tags import br, div, link, meta, p, pre, script, span
+from dominate.tags import br, link, meta, p, pre, script, span
 from dominate.util import text
 
 from .ref import Ref, RefLike, parse_reflike
-from .render import Renderable, Token
 from .word import Word
 
+
+class Token(Enum):
+    SENTENCE_START = auto()
+    SENTENCE_END = auto()
+    PARAGRAPH_START = auto()
+    PARAGRAPH_END = auto()
+    LINE_BREAK = auto()
+
+
+Renderable: TypeAlias = Word | Ref | Token
 Format = Literal["prose", "verse"]
 
 
@@ -45,14 +54,29 @@ class Treebank(metaclass=ABCMeta):
         ...
 
     def __str__(self) -> str:
+        prev: Word | None = None
+        tokens = []
+        for t in iter(self):
+            match t:
+                case Word() as w:
+                    if prev and prev.form not in [".", ",", ";", ":", "·", "]", ")"]:
+                        tokens.append(" ")
+                    tokens.append(w.form)
+                    prev = w
+                case Token.LINE_BREAK | Token.PARAGRAPH_END:
+                    tokens.append("\n")
+                case _:
+                    ...
+        return ''.join(tokens)
+
+    def html(self) -> str:
         doc = dominate.document(title=self.meta.title)
         with doc.head:  # type: ignore
             meta(name="title", content=self.meta.title)
             meta(name="author", content=self.meta.author)
             link(rel="stylesheet", href="/static/styles.css")
         with doc:
-            with pre(cls=f"greek corpus {self.meta.format} syntax"):
-                self.render()
+            self.render()
             script(src="https://cdnjs.cloudflare.com/ajax/libs/cash/8.1.5/cash.min.js")
             script(src="https://unpkg.com/@popperjs/core@2")
             script(src="https://unpkg.com/tippy.js@6")
@@ -60,11 +84,11 @@ class Treebank(metaclass=ABCMeta):
 
         return doc.render()
 
-    def render(self) -> div:
+    def render(self) -> pre:
         prev: Word | None = None
         sentence = span(cls="sentence")
         paragraph = p()
-        container = div()
+        container = pre(cls=f"greek corpus {self.meta.format} syntax")
 
         for t in iter(self):
             match t:

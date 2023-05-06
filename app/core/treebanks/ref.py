@@ -1,6 +1,6 @@
 from abc import ABC
-from dataclasses import astuple, dataclass, field
-from typing import Self, Type
+from dataclasses import astuple, dataclass
+from typing import Self, Type, TypeAlias
 
 from dominate.tags import span
 from ordered_enum import OrderedEnum  # type: ignore
@@ -55,7 +55,7 @@ class RefRange:
                 raise TypeError(f"Cannot check if {obj} is in {self}")
 
 
-RefLike = Ref | RefRange
+RefLike: TypeAlias = Ref | RefRange
 
 
 def parse_reflike(ref_cls, subdoc: str) -> RefLike:

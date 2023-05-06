@@ -6,13 +6,9 @@ from typing import Iterator, Self, Type
 
 from lxml import etree
 
-from app.core.treebanks.ref import RefLike
-from app.core.treebanks.render import Renderable
-
 from ..utils import at
-from .ref import Ref, RefRange
-from .render import Renderable, Token
-from .treebank import Treebank
+from .ref import Ref, RefLike, RefRange
+from .treebank import Renderable, Token, Treebank
 from .word import POS, Case, Word
 
 

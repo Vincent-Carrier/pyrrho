@@ -5,11 +5,9 @@ from typing import Iterator, NamedTuple, Self, cast
 
 from boltons.iterutils import unique
 
-from app.core.treebanks.ref import RefLike
-
 from .conll import ConLL_Treebank
 from .ref import NT_Ref, Ref, RefLike, RefRange
-from .render import Renderable, Token
+from .treebank import Renderable, Token
 from .word import Word
 
 
@@ -58,7 +56,7 @@ class NT_Treebank(ConLL_Treebank):
                 raise TypeError(f"Cannot get {ref} from {self}")
 
     def __iter__(self) -> Iterator[Renderable]:
-        ref = None
+        ref: RefLike | None = None
         for sentence in self.conll:
             yield Token.SENTENCE_START
             for word in sentence:
