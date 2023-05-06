@@ -5,7 +5,7 @@ from typing import Self
 from dominate.tags import span
 
 from ..utils import cx
-from .ref import SubDoc
+from .ref import RefLike
 
 
 class POS(StrEnum):
@@ -121,22 +121,15 @@ class Word:
     case: Case | None
     flags: str | None = None
     definition: str | None = None
-    subdoc: SubDoc | None = None
+    ref: RefLike | None = None
 
-    
-    @classmethod
-    def render(cls, w: Self, next: Self | None = None):
-        whitespace = " "
-        if next and next.form in [".", ",", ";", ":", "·", "]", ")"]:
-            whitespace = ""
-        if w.form in ["[", "("]:
-            whitespace = ""
+    def render(self: Self):
         span(
-            f"{w.form}{whitespace}",
-            cls=cx(w.case, w.pos if w.pos == POS.verb else None),
-            data_id=str(w.id),
-            data_head=str(w.head),
-            data_lemma=w.lemma,
-            data_flags=w.flags,
-            data_def=w.definition,
+            self.form,
+            cls=cx(self.case, self.pos == POS.verb and self.pos),
+            data_id=str(self.id),
+            data_head=str(self.head),
+            data_lemma=self.lemma,
+            data_flags=self.flags,
+            data_def=self.definition,
         )

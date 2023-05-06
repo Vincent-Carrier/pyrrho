@@ -1,22 +1,22 @@
 from abc import ABC
-from dataclasses import astuple, dataclass
-from itertools import takewhile
+from dataclasses import astuple, dataclass, field
 from typing import Self, Type
 
+from dominate.tags import span
 from ordered_enum import OrderedEnum  # type: ignore
 
 
 @dataclass(order=True, frozen=True)
 class Ref(ABC):
+    @classmethod
+    def parse(cls, ref: str) -> Self:
+        return cls(*(int(x) for x in ref.split(".")))
+
     def __iter__(self):
         yield from astuple(self)
 
     def __str__(self) -> str:
         return ".".join(str(x) for x in self if x is not None)
-
-    @classmethod
-    def parse(cls, ref: str) -> Self:
-        return cls(*(int(x) for x in ref.split(".")))
 
     def __contains__(self, ref: object) -> bool:
         if not isinstance(ref, Ref):
@@ -27,6 +27,9 @@ class Ref(ABC):
             if a != b:
                 return False
         return True
+    
+    def render(self):
+        ...
 
 
 @dataclass(order=True, frozen=True)
@@ -52,10 +55,10 @@ class RefRange:
                 raise TypeError(f"Cannot check if {obj} is in {self}")
 
 
-SubDoc = Ref | RefRange
+RefLike = Ref | RefRange
 
 
-def parse_subdoc(ref_cls, subdoc: str) -> SubDoc:
+def parse_reflike(ref_cls, subdoc: str) -> RefLike:
     return RefRange.parse(ref_cls, subdoc) if "-" in subdoc else ref_cls.parse(subdoc)
 
 
@@ -108,14 +111,32 @@ class NT_Book(OrderedEnum):
 class NT_Ref(Ref):
     book: NT_Book
     chapter: int
-    verse: int # we use 0 to indicate a chapter ref, so that we get implicit ordering
+    verse: int
 
     def __str__(self):
-        if self.verse != 0:
-            return f"{self.book.value}_{self.chapter}.{self.verse}"
-        else:
+        if self.is_chapter:
             return f"{self.book.value}_{self.chapter}"
+        else:
+            return f"{self.book.value}_{self.chapter}.{self.verse}"
 
+    @property
+    def is_book(self) -> bool:
+        return self.chapter == 0 and self.verse ==0
+
+    @property
+    def is_chapter(self) -> bool:
+        return  self.chapter > 0 and self.verse == 0
+    
+    @property
+    def is_verse(self) -> bool:
+        assert self.chapter > 0
+        return self.verse != 0
+
+    def render(self):
+        if self.is_chapter:
+            span(self.chapter, cls="chapter")
+        elif self.is_verse:
+            span(self.verse, cls="verse")
 
     @classmethod
     def parse(cls, ref: str) -> Self:

@@ -1,17 +1,18 @@
 import shelve
 from pathlib import Path
-from typing import Any, Generator, Type
+from typing import Any, Iterator, Type
 
 import pyconll
 
 from .ref import Ref
-from .treebank import Sentence, Treebank
+from .render import Renderable, Token
+from .treebank import Treebank
 from .word import POS, Case, Word
 
 lsj = shelve.open("data/ag/lsj")
 
 class ConLL_Treebank(Treebank):
-    _conll: Any
+    conll: Any
 
     def __init__(
         self,
@@ -20,13 +21,14 @@ class ConLL_Treebank(Treebank):
         **kwargs,
     ) -> None:
         super().__init__(ref_cls=ref_cls, **kwargs)
-        self._conll = pyconll.load_from_file(str(f))
+        self.conll = pyconll.load_from_file(str(f))
 
-    def sentences(self, start=0, end=-1) -> Generator[Sentence, None, None]:
-        for sentence in self._conll[start:end]:
-            yield Sentence(
-                words=[self.word(w) for w in sentence],
-            )
+    def tokens(self) -> Iterator[Renderable]:
+        # TODO: handle subdoc
+        for sentence in self.conll:
+            yield Token.SENTENCE_START
+            yield from (self.word(w) for w in sentence)
+            yield Token.SENTENCE_END
 
     def word(self, w: Any) -> Word:
         kase = w.feats.get("Case")
