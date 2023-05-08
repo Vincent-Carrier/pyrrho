@@ -1,56 +1,67 @@
-from bisect import bisect_left, bisect_right
 from copy import copy
+from dataclasses import replace
+from itertools import groupby
 from pathlib import Path
-from typing import Iterator, NamedTuple, Self, cast
-
-from boltons.iterutils import unique
+from typing import Iterable, Iterator, Self, cast
 
 from .conll import ConLL_Treebank
-from .ref import NT_Ref, Ref, RefLike, RefRange
+from .ref import NT_Book, NT_Ref, Ref, RefLike, RefRange, lt_reflike
 from .treebank import Renderable, Token
 from .word import Word
 
 
-class RefIdx(NamedTuple):
-    ref: NT_Ref
-    sentence_idx: int
+class RefTree:
+    tree: dict[NT_Book, dict[int, list[int]]] = {}
+
+    def __init__(self, refs: Iterable[NT_Ref]) -> None:
+        for book, chapters in groupby(refs, key=lambda r: r.book):
+            self.tree[book] = {}
+            for chapter, verses in groupby(chapters, key=lambda r: r.chapter):
+                self.tree[book][chapter] = [r.verse for r in verses]
+
+    def __contains__(self, ref: NT_Ref) -> bool:
+        b, c, v = ref
+        return b in self.tree and c in self.tree[b] and v in self.tree[b][c]
+
+    def next(self, ref: NT_Ref) -> NT_Ref | None:
+        b, c, v = ref
+        if ref.is_verse:
+            verse = next(iter(self.tree[b][c][v:]), None)
+            if verse:
+                return replace(ref, verse=verse)
+        if ref.is_chapter:
+            verses = self.tree[b].get(c + 1)
+            return replace(ref, chapter=c + 1) if verses else self.next(NT_Ref(b))
+        return None
 
 
 class NT_Treebank(ConLL_Treebank):
-    _refs: list[RefIdx]
+    refs: dict[NT_Ref, int]
+    ref_tree: RefTree
 
     def __init__(self, f: Path, **kwargs) -> None:
         super().__init__(f, ref_cls=NT_Ref, **kwargs)
-        self._refs = unique(
-            RefIdx(_get_ref(w), i) for i, s in enumerate(self.conll) for w in s
-        )
+        self.refs = {get_ref(w): i for i, s in enumerate(self.conll) for w in s}
+        self.ref_tree = RefTree(self.refs.keys())
 
     def __getitem__(self, ref: RefLike | str) -> Self:
         i, j = 0, 0
         match ref:
             case str():
                 return self[self.parse_reflike(ref)]
-            case NT_Ref(b, c, v) as r:
-                if r not in self:
-                    raise KeyError(f"Cannot find {ref} in {self}")
+            case NT_Ref() as r:
+                if r.is_book:
+                    raise NotImplementedError
                 if r.is_chapter:
-                    r = NT_Ref(b, c, 1)
-                    i = bisect_left(self._refs, r, key=lambda x: x.ref)
-                    j = bisect_left(self._refs, r, key=lambda x: x.ref) + 2  # TODO
-                else:
-                    assert r.is_verse
-                    i = bisect_left(self._refs, ref, key=lambda x: x.ref)
-                    j = i + 1
+                    start = replace(r, verse=1)
+                rr = RefRange(r, self.ref_tree.next(r) or r)
+                return self[rr]
+            case RefRange(start, end) as rr:
+                i = self.refs[start]
+                j = self.refs[end]
                 tb = copy(self)
                 tb.conll = self.conll[i:j]
-                tb.ref = r
-                return tb
-            case RefRange(start, end) as r:
-                i = bisect_left(self._refs, start, key=lambda x: x.ref)
-                j = bisect_right(self._refs, end, key=lambda x: x.ref)
-                tb = copy(self)
-                tb.conll = self.conll[i:j]
-                tb.ref = r
+                tb.ref = rr
                 return tb
             case _:
                 raise TypeError(f"Cannot get {ref} from {self}")
@@ -61,6 +72,8 @@ class NT_Treebank(ConLL_Treebank):
             yield Token.SENTENCE_START
             for word in sentence:
                 w = self.word(word)
+                if self.ref and lt_reflike(self.ref, w.ref):
+                    break
                 if w.ref and w.ref != ref:
                     yield cast(Ref, w.ref)
                     ref = w.ref
@@ -69,9 +82,10 @@ class NT_Treebank(ConLL_Treebank):
 
     def word(self, word) -> Word:
         w = super().word(word)
-        w.ref = _get_ref(word)
+        w.ref = get_ref(word)
         return w
 
 
-def _get_ref(w) -> NT_Ref:
-    return NT_Ref.parse(next(w.misc["Ref"]))
+def get_ref(w) -> NT_Ref:
+    [r] = iter(w.misc["Ref"])
+    return NT_Ref.parse(r)

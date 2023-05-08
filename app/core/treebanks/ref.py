@@ -1,6 +1,6 @@
 from abc import ABC
 from dataclasses import astuple, dataclass
-from typing import Self, Type, TypeAlias
+from typing import Generic, Self, Type, TypeAlias, TypeVar
 
 from dominate.tags import span
 from ordered_enum import OrderedEnum  # type: ignore
@@ -27,15 +27,18 @@ class Ref(ABC):
             if a != b:
                 return False
         return True
-    
+
     def render(self):
         ...
 
 
+T = TypeVar("T", bound=Ref)
+
+
 @dataclass(order=True, frozen=True)
-class RefRange:
-    start: Ref
-    end: Ref
+class RefRange(Generic[T]):
+    start: T
+    end: T
 
     @classmethod
     def parse(cls, ref_cls: Type[Ref], ref: str) -> Self:
@@ -110,8 +113,8 @@ class NT_Book(OrderedEnum):
 @dataclass(order=True, frozen=True, slots=True)
 class NT_Ref(Ref):
     book: NT_Book
-    chapter: int
-    verse: int
+    chapter: int = 0
+    verse: int = 0
 
     def __str__(self):
         if self.is_chapter:
@@ -121,12 +124,12 @@ class NT_Ref(Ref):
 
     @property
     def is_book(self) -> bool:
-        return self.chapter == 0 and self.verse ==0
+        return self.chapter == 0 and self.verse == 0
 
     @property
     def is_chapter(self) -> bool:
-        return  self.chapter > 0 and self.verse == 0
-    
+        return self.chapter > 0 and self.verse == 0
+
     @property
     def is_verse(self) -> bool:
         assert self.chapter > 0
@@ -149,4 +152,10 @@ class NT_Ref(Ref):
         else:
             return cls(NT_Book(b), int(cv), 0)
 
-    # TODO __contains__
+
+def lt_reflike(a: RefLike, b: RefLike | None):
+    if b is None:
+        return True
+    a = a.end if isinstance(a, RefRange) else a
+    b = b.start if isinstance(b, RefRange) else b
+    return a < b

@@ -67,12 +67,11 @@ class Treebank(metaclass=ABCMeta):
                     tokens.append("\n")
                 case _:
                     ...
-        return ''.join(tokens)
+        return "".join(tokens)
 
     def html(self) -> str:
         doc = dominate.document(title=self.meta.title)
         with doc.head:  # type: ignore
-            meta(name="title", content=self.meta.title)
             meta(name="author", content=self.meta.author)
             link(rel="stylesheet", href="/static/styles.css")
         with doc:
