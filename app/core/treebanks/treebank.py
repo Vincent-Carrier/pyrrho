@@ -1,13 +1,12 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Iterator, Literal, Self, Type, TypeAlias
+from typing import Any, Generic, Iterator, Literal, Self, Type, TypeAlias, cast
 
 import dominate
-from dominate.tags import br, link, meta, p, pre, script, span
-from dominate.util import text
+from dominate.tags import a, br, link, meta, p, pre, script, span
 
-from .ref import Ref, RefLike, parse_reflike
+from .ref import Ref, RefLike, T, parse_reflike
 from .word import Word
 
 
@@ -32,7 +31,7 @@ class Metadata:
     format: Format = "prose"
 
 
-class Treebank(metaclass=ABCMeta):
+class Treebank(Generic[T], metaclass=ABCMeta):
     meta: Metadata
     ref_cls: Type[Ref]
     ref: RefLike | None = None
@@ -71,11 +70,13 @@ class Treebank(metaclass=ABCMeta):
 
     def html(self) -> str:
         doc = dominate.document(title=self.meta.title)
+        body = self.render()
         with doc.head:  # type: ignore
             meta(name="author", content=self.meta.author)
             link(rel="stylesheet", href="/static/styles.css")
         with doc:
-            self.render()
+            doc.add(body)
+            self.render_next()
             script(src="https://cdnjs.cloudflare.com/ajax/libs/cash/8.1.5/cash.min.js")
             script(src="https://unpkg.com/@popperjs/core@2")
             script(src="https://unpkg.com/tippy.js@6")
@@ -92,25 +93,34 @@ class Treebank(metaclass=ABCMeta):
         for t in iter(self):
             match t:
                 case Word() as w:
-                    if prev and prev.form not in [".", ",", ";", ":", "·", "]", ")"]:
-                        text(" ")
-                    sentence += w.render()
+                    ws = " " if prev and prev.form not in PUNCTUATION else ""
+                    sentence += w.render(ws)
                     prev = w
                 case Ref() as r:
-                    r.render()
+                    sentence += r.render()
                 case Token.SENTENCE_START:
                     sentence = span(cls="sentence")
                 case Token.SENTENCE_END:
-                    paragraph += sentence
+                    if len(sentence):
+                        paragraph += sentence
                 case Token.PARAGRAPH_START:
                     paragraph = p()
                 case Token.PARAGRAPH_END:
-                    container += paragraph
+                    if len(paragraph):
+                        container += paragraph
                 case Token.LINE_BREAK:
                     br()
                 case _:
                     raise ValueError(f"Unknown token type: {t!r}")
+        if len(paragraph):
+            container += paragraph
         return container
+    
+    def render_next(self) -> Any:
+        ...
 
     def parse_reflike(self, ref: str) -> RefLike:
-        return parse_reflike(self.ref_cls, ref)
+        return cast(RefLike, parse_reflike(self.ref_cls, ref))
+
+
+PUNCTUATION = [".", ",", ";", ":", "·", "]", ")"]

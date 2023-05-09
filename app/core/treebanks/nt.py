@@ -2,7 +2,7 @@ from copy import copy
 from dataclasses import replace
 from itertools import groupby
 from pathlib import Path
-from typing import Iterable, Iterator, Self, cast
+from typing import Any, Iterable, Iterator, Self, cast
 
 from .conll import ConLL_Treebank
 from .ref import NT_Book, NT_Ref, Ref, RefLike, RefRange, lt_reflike
@@ -19,6 +19,11 @@ class RefTree:
             for chapter, verses in groupby(chapters, key=lambda r: r.chapter):
                 self.tree[book][chapter] = [r.verse for r in verses]
 
+    def __getitem__(self, ref: NT_Ref) -> list[int]:
+        b, c = ref
+        assert ref.is_chapter
+        return self.tree[b][c]
+    
     def __contains__(self, ref: NT_Ref) -> bool:
         b, c, v = ref
         return b in self.tree and c in self.tree[b] and v in self.tree[b][c]
@@ -54,6 +59,8 @@ class NT_Treebank(ConLL_Treebank):
                     raise NotImplementedError
                 if r.is_chapter:
                     start = replace(r, verse=1)
+                    end = replace(r, verse=self.ref_tree[r][-1])
+                    return self[RefRange(start, end)]
                 rr = RefRange(r, self.ref_tree.next(r) or r)
                 return self[rr]
             case RefRange(start, end) as rr:
@@ -73,12 +80,17 @@ class NT_Treebank(ConLL_Treebank):
             for word in sentence:
                 w = self.word(word)
                 if self.ref and lt_reflike(self.ref, w.ref):
-                    break
+                    raise StopIteration
                 if w.ref and w.ref != ref:
                     yield cast(Ref, w.ref)
                     ref = w.ref
                 yield w
             yield Token.SENTENCE_END
+
+    def render_next(self) -> Any:
+        assert self.ref
+        if next := self.ref_tree.next(self.ref):
+            return a("Next", href=f"/corpus/ag/nt?ref={next}")
 
     def word(self, word) -> Word:
         w = super().word(word)

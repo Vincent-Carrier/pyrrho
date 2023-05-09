@@ -58,7 +58,7 @@ class RefRange(Generic[T]):
                 raise TypeError(f"Cannot check if {obj} is in {self}")
 
 
-RefLike: TypeAlias = Ref | RefRange
+RefLike: TypeAlias = T | RefRange[T]
 
 
 def parse_reflike(ref_cls, subdoc: str) -> RefLike:
