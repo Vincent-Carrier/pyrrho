@@ -20,7 +20,7 @@ class RefTree:
                 self.tree[book][chapter] = [r.verse for r in verses]
 
     def __getitem__(self, ref: NT_Ref) -> list[int]:
-        b, c = ref
+        b, c, v = ref
         assert ref.is_chapter
         return self.tree[b][c]
     
@@ -88,9 +88,10 @@ class NT_Treebank(ConLL_Treebank):
             yield Token.SENTENCE_END
 
     def render_next(self) -> Any:
-        assert self.ref
-        if next := self.ref_tree.next(self.ref):
-            return a("Next", href=f"/corpus/ag/nt?ref={next}")
+        ...
+        # assert self.ref
+        # if next := self.ref_tree.next(self.ref):
+        #     return a("Next", href=f"/corpus/ag/nt?ref={next}")
 
     def word(self, word) -> Word:
         w = super().word(word)

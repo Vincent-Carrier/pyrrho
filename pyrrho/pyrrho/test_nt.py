@@ -1,10 +1,12 @@
 from pathlib import Path
 
-from ..langs.ag.corpus import corpus
+from pyrrho.langs.ag.corpus import corpus
+
+from .constants import AG
 from .nt import NT_Treebank
 
 tb = NT_Treebank(
-    Path("data/ag") / "new-testament.conllu",
+    AG / "new-testament.conllu",
     title="New Testament",
 )
 

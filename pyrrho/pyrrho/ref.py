@@ -153,9 +153,10 @@ class NT_Ref(Ref):
             return cls(NT_Book(b), int(cv), 0)
 
 
+# TODO: make RefLike a class
 def lt_reflike(a: RefLike, b: RefLike | None):
     if b is None:
         return True
     a = a.end if isinstance(a, RefRange) else a
     b = b.start if isinstance(b, RefRange) else b
-    return a < b
+    return a < b  # type: ignore

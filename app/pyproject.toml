@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "app"
+version = "0.1.0"
+description = ""
+authors = ["Vincent Carrier <vincentcarrier15@gmail.com>"]
+packages = [{ include = "app" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.95.1"
+uvicorn = {extras = ["standard"], version = "^0.21.1"}
+boltons = "^23.0.0"
+requests = "^2.28.2"
+python-dotenv = "^1.0.0"
+rich = "^13.3.4"
+pyrrho = {path="../pyrrho", develop=true}
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

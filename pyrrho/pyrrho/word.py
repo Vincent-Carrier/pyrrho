@@ -4,8 +4,8 @@ from typing import Self
 
 from dominate.tags import span
 
-from ..utils import cx
 from .ref import RefLike
+from .utils import cx
 
 
 class POS(StrEnum):
@@ -123,7 +123,7 @@ class Word:
     definition: str | None = None
     ref: RefLike | None = None
 
-    def render(self: Self, whitespace: str) -> span:
+    def render(self: Self, whitespace: str = "") -> span:
         return span(
             f"{whitespace}{self.form}",
             cls=cx(self.case, self.pos == POS.verb and self.pos),

@@ -1,14 +1,14 @@
 import re
-import shelve
 from copy import copy
 from pathlib import Path
 from typing import Iterator, Self, Type
 
 from lxml import etree
 
-from ..utils import at
+from .constants import AG, LSJ
 from .ref import Ref, RefLike, RefRange
 from .treebank import Renderable, Token, Treebank
+from .utils import at
 from .word import POS, Case, Word
 
 
@@ -117,5 +117,5 @@ class PerseusTreebank(Treebank):
             definition=lsj.get(lemma) if lemma else None,
         )
 
-lsj = shelve.open("data/ag/lsj")
+lsj = LSJ()
 

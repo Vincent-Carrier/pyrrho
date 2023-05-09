@@ -1,16 +1,14 @@
-import shelve
 from pathlib import Path
 from typing import Any, Iterator, Type
 
 import pyconll
 
-from app.core.treebanks.ref import RefLike
-
-from .ref import Ref
+from .constants import LSJ
+from .ref import Ref, RefLike
 from .treebank import Renderable, Token, Treebank
 from .word import POS, Case, Word
 
-lsj = shelve.open("data/ag/lsj")
+lsj = LSJ()
 
 
 class ConLL_Treebank(Treebank):
