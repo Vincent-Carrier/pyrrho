@@ -1,17 +1,18 @@
 import re
 from copy import copy
 from pathlib import Path
-from typing import Iterator, Self, Type
+from typing import Iterator, Self, Type, final
 
 from lxml import etree
 
-from .constants import AG, LSJ
+from .constants import LSJ
 from .ref import Ref, RefLike, RefRange
 from .treebank import Renderable, Token, Treebank
 from .utils import at
 from .word import POS, Case, Word
 
 
+@final
 class PerseusTreebank(Treebank):
     body: etree._Element
     gorman: bool

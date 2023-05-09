@@ -1,13 +1,13 @@
-from abc import ABC
+from abc import ABC, ABCMeta
 from dataclasses import astuple, dataclass
-from typing import Generic, Self, Type, TypeAlias, TypeVar
+from typing import Generic, Self, Type, TypeAlias, TypeVar, final
 
 from dominate.tags import span
 from ordered_enum import OrderedEnum  # type: ignore
 
 
 @dataclass(order=True, frozen=True)
-class Ref(ABC):
+class Ref(metaclass=ABCMeta):
     @classmethod
     def parse(cls, ref: str) -> Self:
         return cls(*(int(x) for x in ref.split(".")))
@@ -34,7 +34,7 @@ class Ref(ABC):
 
 T = TypeVar("T", bound=Ref)
 
-
+@final
 @dataclass(order=True, frozen=True)
 class RefRange(Generic[T]):
     start: T
@@ -65,6 +65,7 @@ def parse_reflike(ref_cls, subdoc: str) -> RefLike:
     return RefRange.parse(ref_cls, subdoc) if "-" in subdoc else ref_cls.parse(subdoc)
 
 
+@final
 @dataclass(order=True, frozen=True, slots=True)
 class BCV(Ref):
     book: int
@@ -72,12 +73,14 @@ class BCV(Ref):
     verse: int | None = None
 
 
+@final
 @dataclass(order=True, frozen=True, slots=True)
 class CV(Ref):
     chapter: int
     verse: int | None = None
 
 
+@final
 @dataclass(order=True, frozen=True, slots=True)
 class Line(Ref):
     line: int
@@ -110,6 +113,7 @@ class NT_Book(OrderedEnum):
     REV = "REV"
 
 
+@final
 @dataclass(order=True, frozen=True, slots=True)
 class NT_Ref(Ref):
     book: NT_Book

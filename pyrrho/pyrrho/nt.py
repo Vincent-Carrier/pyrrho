@@ -2,7 +2,7 @@ from copy import copy
 from dataclasses import replace
 from itertools import groupby
 from pathlib import Path
-from typing import Any, Iterable, Iterator, Self, cast
+from typing import Any, Iterable, Iterator, Self, cast, final
 
 from .conll import ConLL_Treebank
 from .ref import NT_Book, NT_Ref, Ref, RefLike, RefRange, lt_reflike
@@ -40,6 +40,7 @@ class RefTree:
         return None
 
 
+@final
 class NT_Treebank(ConLL_Treebank):
     refs: dict[NT_Ref, int]
     ref_tree: RefTree
