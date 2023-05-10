@@ -1,6 +1,6 @@
 from pytest import mark
 
-from .ref import BCV, CV, NT_Book, NT_Ref, Ref, RefRange
+from .ref import BCV, CV, Book, RefPoint, RefRange
 
 eq_tests = [
     (BCV(1, 1, 1), BCV(1, 1, 1), True),
@@ -9,7 +9,7 @@ eq_tests = [
 ]
 
 @mark.parametrize("a, b, expected", eq_tests)
-def test_eq_ref(a: Ref, b: Ref, expected: bool):
+def test_eq_ref(a: RefPoint, b: RefPoint, expected: bool):
     assert (a == b) == expected
 
 lt_tests = [
@@ -20,7 +20,7 @@ lt_tests = [
 ]
 
 @mark.parametrize("a, b, expected", lt_tests)
-def test_lt_ref(a: Ref, b: Ref, expected: bool):
+def test_lt_ref(a: RefPoint, b: RefPoint, expected: bool):
     assert (a < b) == expected
 
 ref_contains_tests = [
@@ -32,7 +32,7 @@ ref_contains_tests = [
 ]
 
 @mark.parametrize("a, b, expected", ref_contains_tests)
-def test_ref_contains(a: Ref, b: Ref, expected: bool):
+def test_ref_contains(a: RefPoint, b: RefPoint, expected: bool):
     assert (b in a) == expected
 
 def test_parse():
@@ -40,8 +40,8 @@ def test_parse():
     assert BCV.parse("1.1") == BCV(1, 1, None)
     assert CV.parse("1.1") == CV(1, 1)
     assert CV.parse("1") == CV(1)
-    assert NT_Ref.parse("MATT_1.1") == NT_Ref(NT_Book('MATT'), 1, 1)
-    assert NT_Ref.parse("MATT_1") == NT_Ref(NT_Book('MATT'), 1, 0)
+    assert BCV.parse("MATT_1.1") == BCV(Book('MATT'), 1, 1)
+    assert BCV.parse("MATT_1") == BCV(Book('MATT'), 1, 0)
 
 def test_parse_range():
     assert RefRange.parse(BCV, "1.1.1-1.1.2") == RefRange(BCV(1, 1, 1), BCV(1, 1, 2))

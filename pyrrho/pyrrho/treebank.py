@@ -6,7 +6,7 @@ from typing import Any, Generic, Iterator, Literal, Self, Type, TypeAlias, cast
 import dominate
 from dominate.tags import a, br, link, meta, p, pre, script, span
 
-from .ref import Ref, RefLike, T, parse_reflike
+from .ref import Ref, RefPoint, T
 from .word import Word
 
 
@@ -18,7 +18,7 @@ class Token(Enum):
     LINE_BREAK = auto()
 
 
-Renderable: TypeAlias = Word | Ref | Token
+Renderable: TypeAlias = Word | RefPoint | Token
 Format = Literal["prose", "verse"]
 
 
@@ -33,19 +33,19 @@ class Metadata:
 
 class Treebank(Generic[T], metaclass=ABCMeta):
     meta: Metadata
-    ref_cls: Type[Ref]
-    ref: RefLike | None = None
+    ref_cls: Type[RefPoint]
+    ref: Ref | None = None
 
-    def __init__(self, ref_cls: Type[Ref], **kwargs) -> None:
+    def __init__(self, ref_cls: Type[RefPoint], **kwargs) -> None:
         self.meta = Metadata(**kwargs)
         self.ref_cls = ref_cls
 
     @abstractmethod
-    def __getitem__(self, ref: RefLike | str) -> Self:
+    def __getitem__(self, ref: Ref | str) -> Self:
         ...
 
     @abstractmethod
-    def __contains__(self, ref: RefLike) -> bool:
+    def __contains__(self, ref: Ref) -> bool:
         ...
 
     @abstractmethod
@@ -96,7 +96,7 @@ class Treebank(Generic[T], metaclass=ABCMeta):
                     ws = " " if prev and prev.form not in PUNCTUATION else ""
                     sentence += w.render(ws)
                     prev = w
-                case Ref() as r:
+                case RefPoint() as r:
                     sentence += r.render()
                 case Token.SENTENCE_START:
                     sentence = span(cls="sentence")
@@ -115,12 +115,12 @@ class Treebank(Generic[T], metaclass=ABCMeta):
         if len(paragraph):
             container += paragraph
         return container
-    
+
     def render_next(self) -> Any:
         ...
 
-    def parse_reflike(self, ref: str) -> RefLike:
-        return cast(RefLike, parse_reflike(self.ref_cls, ref))
+    def parse_ref(self, ref: str) -> Ref[T]:
+        return Ref.parse(self.ref_cls, ref)
 
 
 PUNCTUATION = [".", ",", ";", ":", "·", "]", ")"]

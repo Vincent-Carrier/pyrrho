@@ -4,7 +4,7 @@ from typing import Self
 
 from dominate.tags import span
 
-from .ref import RefLike
+from .ref import Ref
 from .utils import cx
 
 
@@ -121,7 +121,7 @@ class Word:
     case: Case | None
     flags: str | None = None
     definition: str | None = None
-    ref: RefLike | None = None
+    ref: Ref | None = None
 
     def render(self: Self, whitespace: str = "") -> span:
         return span(

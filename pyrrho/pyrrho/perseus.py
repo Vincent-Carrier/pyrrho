@@ -6,22 +6,22 @@ from typing import Iterator, Self, Type, final
 from lxml import etree
 
 from .constants import LSJ
-from .ref import Ref, RefLike, RefRange
+from .ref import Ref, RefPoint, RefRange
 from .treebank import Renderable, Token, Treebank
 from .utils import at
 from .word import POS, Case, Word
 
 
 @final
-class PerseusTreebank(Treebank):
+class TB(Treebank):
     body: etree._Element
     gorman: bool
-    _reflikes: list[RefLike] = []
+    _reflikes: list[Ref] = []
 
     def __init__(
         self,
         f: Path,
-        ref_cls: Type[Ref],
+        ref_cls: Type[RefPoint],
         gorman: bool = False,
         **kwargs,
     ) -> None:
@@ -44,17 +44,17 @@ class PerseusTreebank(Treebank):
                 self.meta.urn = self.normalize_urn(self.meta.urn)
 
             self._reflikes = [
-                self.parse_reflike(reflike)
+                self.parse_ref(reflike)
                 for sentence in self.body.findall(".//sentence")
                 if (rl := sentence.attrib.get("subdoc")) is not None
                 and (reflike := str(rl)) != ""
             ]
 
-    def __getitem__(self, ref: RefLike | str) -> Self:
+    def __getitem__(self, ref: Ref | str) -> Self:
         match ref:
             case str():
-                return self[self.parse_reflike(ref)]
-            case RefRange() | Ref() as r:
+                return self[self.parse_ref(ref)]
+            case RefRange() | RefPoint() as r:
                 tb = copy(self)
                 tb.ref = r
                 if ref not in self:
@@ -64,7 +64,7 @@ class PerseusTreebank(Treebank):
             case _:
                 raise TypeError(f"Cannot get {ref} from {self}")
 
-    def __contains__(self, ref: RefLike) -> bool:
+    def __contains__(self, ref: Ref) -> bool:
         return True  # TODO
     
     def sentences(self) -> Iterator[etree._Element]:

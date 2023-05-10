@@ -3,9 +3,9 @@ from pathlib import Path
 from pyrrho.langs.ag.corpus import corpus
 
 from .constants import AG
-from .nt import NT_Treebank
+from .nt import GntTreebank
 
-tb = NT_Treebank(
+tb = GntTreebank(
     AG / "new-testament.conllu",
     title="New Testament",
 )

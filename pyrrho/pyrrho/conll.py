@@ -1,23 +1,23 @@
 from pathlib import Path
-from typing import Any, Iterator, Type
+from typing import Any, Generic, Iterator, Type
 
 import pyconll
 
 from .constants import LSJ
-from .ref import Ref, RefLike
+from .ref import Ref, T
 from .treebank import Renderable, Token, Treebank
 from .word import POS, Case, Word
 
 lsj = LSJ()
 
 
-class ConLL_Treebank(Treebank):
+class TB(Generic[T], Treebank[T]):
     conll: Any
 
     def __init__(
         self,
         f: Path,
-        ref_cls: Type[Ref],
+        ref_cls: Type[T],
         **kwargs,
     ) -> None:
         super().__init__(ref_cls=ref_cls, **kwargs)
@@ -30,7 +30,7 @@ class ConLL_Treebank(Treebank):
             yield from (self.word(w) for w in sentence)
             yield Token.SENTENCE_END
 
-    def __contains__(self, ref: RefLike) -> bool:
+    def __contains__(self, ref: Ref[T]) -> bool:
         return True  # TODO
 
     def word(self, w) -> Word:
