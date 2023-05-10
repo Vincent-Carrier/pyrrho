@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from pyrrho.langs.ag.corpus import corpus
+from pyrrho.corpus.ag import corpus
 
 from .constants import AG
 from .nt import GntTreebank

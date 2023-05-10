@@ -1,1 +1,1 @@
-from .nt import TB
+from .nt import GntTreebank as TB

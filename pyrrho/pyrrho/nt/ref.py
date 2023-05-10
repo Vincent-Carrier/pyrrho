@@ -89,7 +89,7 @@ class RefTree:
                 self.tree[book][chapter] = [r.verse for r in verses]
 
     def __getitem__(self, ref: BCV) -> list[int]:
-        b, c, v = ref
+        b, c, _ = ref
         assert ref.is_chapter
         return self.tree[b][c]
     

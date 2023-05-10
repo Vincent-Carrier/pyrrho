@@ -7,7 +7,8 @@ from lxml import etree
 
 from .constants import LSJ
 from .ref import Ref, RefPoint, RefRange
-from .treebank import Renderable, Token, Treebank
+from .token import FormatToken
+from .treebank import Token, Treebank
 from .utils import at
 from .word import POS, Case, Word
 
@@ -70,25 +71,16 @@ class TB(Treebank):
     def sentences(self) -> Iterator[etree._Element]:
         yield from self.body.findall(".//sentence")
 
-    def __iter__(self) -> Iterator[Renderable]:
+    def __iter__(self) -> Iterator[Token]:
         # TODO: yield paragraph tokens
         for sentence in self.sentences():
-            yield Token.SENTENCE_START
+            yield FormatToken.SENTENCE_START
             yield from (self.word(el.attrib) for el in sentence)  # type: ignore
-            yield Token.SENTENCE_END
+            yield FormatToken.SENTENCE_END
 
 
     def normalize_urn(self, urn: str | bytes) -> str:
         return re.search(r"^(urn:cts:greekLit:tlg\d{4}.tlg\d{3}).*", str(urn)).group(1)  # type: ignore
-
-    # def sentences(self) -> Iterator[Sentence]:
-    #     yield from (self.sentence(el) for el in self.body.findall(".//sentence"))  # type: ignore
-
-    # def sentence(self, el: Element) -> Sentence:
-    #     words: list[Word] = [
-    #         w for token in el if (w := _word(token.attrib)) is not None
-    #     ]
-    #     return Sentence(words, self._parse_subdoc(el.attrib["subdoc"]))
 
     def word(self, attr: dict) -> Word | None:
         if attr.get("insertion_id") is not None:  # TODO

@@ -1,12 +1,13 @@
 from copy import copy
 from dataclasses import replace
 from pathlib import Path
-from typing import Any, Iterator, Self, cast, final
+from typing import Iterator, Self, cast, final
 
 from pyrrho import conll
 
 from ..ref import Ref, RefRange
-from ..treebank import Renderable, Token
+from ..token import FormatToken
+from ..treebank import Token
 from ..word import Word
 from .ref import BCV, RefTree
 
@@ -46,12 +47,11 @@ class GntTreebank(conll.TB[BCV]):
         tb.conll = self.conll[i:j]
         tb.ref = Ref(r)
         return tb
-        
 
-    def __iter__(self) -> Iterator[Renderable]:
+    def __iter__(self) -> Iterator[Token]:
         ref: BCV | None = None
         for sentence in self.conll:
-            yield Token.SENTENCE_START
+            yield FormatToken.SENTENCE_START
             for word in sentence:
                 w = self.word(word)
                 if self.ref and self.ref < w.ref:
@@ -61,20 +61,13 @@ class GntTreebank(conll.TB[BCV]):
                     yield wref
                     ref = wref
                 yield w
-            yield Token.SENTENCE_END
-
-    def render_next(self) -> Any:
-        ...
-        # assert self.ref
-        # if next := self.ref_tree.next(self.ref):
-        #     return a("Next", href=f"/corpus/ag/nt?ref={next}")
+            yield FormatToken.SENTENCE_END
 
     def word(self, word) -> Word:
         w = super().word(word)
-        w.ref = get_ref(word)  # type: ignore
+        w.ref = Ref(self.get_bcv(word))
         return w
 
-
-    def get_bcv(self, w) -> BCV:
-        [r] = iter(w.misc["Ref"])
+    def get_bcv(self, word) -> BCV:
+        [r] = iter(word.misc["Ref"])
         return BCV.parse(r)
