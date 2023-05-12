@@ -1,8 +1,5 @@
-from pathlib import Path
-
-from pyrrho.corpus.ag import corpus
-
-from .constants import AG
+from ..constants import AG
+from ..corpus.ag import corpus
 from .nt import GntTreebank
 
 tb = GntTreebank(

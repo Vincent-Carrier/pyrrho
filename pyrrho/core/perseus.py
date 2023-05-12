@@ -107,7 +107,7 @@ class TB(Treebank[T]):
         ref = None
         cite = attr.get("cite")
         if cite:
-            
+            pass
 
         return Word(
             id=parse_int(attr.get("id")),

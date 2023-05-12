@@ -3,9 +3,9 @@ from functools import cache
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import HTMLResponse
 
-import pyrrho.corpus as corpus
-from pyrrho.render import StandaloneRenderer
-from pyrrho.treebank import Treebank
+from pyrrho.core import corpus
+from pyrrho.core.render import StandaloneRenderer
+from pyrrho.core.treebank import Treebank
 
 router = APIRouter()
 
@@ -24,6 +24,7 @@ router = APIRouter()
 #             return HTTPException(status_code=404, detail=f"Unknown language {lang}")
 
 renderer = StandaloneRenderer()
+
 
 @router.get("/{lang}/{slug}", response_class=HTMLResponse)
 async def get_treebank(lang: str, slug: str, ref: str | None = None):

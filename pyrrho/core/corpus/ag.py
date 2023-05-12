@@ -1,9 +1,9 @@
 from typing import Callable
 
-from pyrrho import nt, perseus
-from pyrrho.constants import AG
-from pyrrho.ref import BCV
-from pyrrho.treebank import Treebank
+from .. import nt, perseus
+from ..constants import AG
+from ..ref import BCV
+from ..treebank import Treebank
 
 corpus: dict[str, Callable[[], Treebank]] = {
     "histories": lambda: perseus.TB(

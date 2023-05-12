@@ -3,8 +3,7 @@ from dataclasses import replace
 from pathlib import Path
 from typing import Iterator, Self, cast, final
 
-from pyrrho import conll
-
+from .. import conll
 from ..ref import Ref, RefRange
 from ..token import FormatToken
 from ..treebank import Token
