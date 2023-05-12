@@ -9,6 +9,9 @@ def at(l: list[T] | None, i: int) -> T | None:
         return None
     return l[i] if len(l) > i else None
 
+def parse_int(s: str | None) -> int | None:
+    return int(s) if s else None
+
 def cx(*args: Any) -> str | None:
     return " ".join(str(a) for a in args if a) or None
 

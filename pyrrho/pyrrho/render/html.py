@@ -22,7 +22,7 @@ class HtmlRenderer(metaclass=ABCMeta):
         for t in tokens:
             match t:
                 case Word() as w:
-                    ws = " " if prev and prev.form not in PUNCTUATION else ""
+                    ws = " " if prev and (w.form not in PUNCTUATION) else ""
                     sentence += w.render(ws)
                     prev = w
                 case RefPoint() as r:
@@ -39,6 +39,8 @@ class HtmlRenderer(metaclass=ABCMeta):
                         container += paragraph
                 case FT.LINE_BREAK:
                     h.br()
+                case None:
+                    pass
                 case _:
                     raise ValueError(f"Unknown token type: {t!r}")
         if len(paragraph):

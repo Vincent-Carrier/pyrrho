@@ -39,19 +39,22 @@ class Treebank(Generic[T], metaclass=ABCMeta):
     def __iter__(self) -> Iterator[Token]:
         ...
 
-    def __repr__(self) -> str:
+    def __str__(self) -> str:
         prev: Word | None = None
         tokens = []
         for t in iter(self):
             match t:
                 case Word() as w:
-                    if prev and prev.form not in PUNCTUATION:
+                    if prev and w.form not in PUNCTUATION:
                         tokens.append(" ")
                     tokens.append(w.form)
                     prev = w
                 case FormatToken.LINE_BREAK | FormatToken.PARAGRAPH_END:
                     tokens.append("\n")
         return "".join(tokens)
+    
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__} title={self.meta.title} ref={self.ref}>"
 
     def parse_ref(self, ref: str) -> Ref[T]:
         return Ref.parse(self.ref_cls, ref)

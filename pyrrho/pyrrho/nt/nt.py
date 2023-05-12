@@ -27,7 +27,7 @@ class GntTreebank(conll.TB[BCV]):
         r: RefRange[BCV]
         if isinstance(ref, str):
             return self[self.parse_ref(ref)]
-        match ref():
+        match ref.value:
             case BCV() as bcv:
                 if bcv.is_book:
                     raise NotImplementedError

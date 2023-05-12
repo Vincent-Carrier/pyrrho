@@ -60,38 +60,43 @@ class RefRange(Generic[T]):
 @total_ordering
 @dataclass(frozen=True, slots=True)
 class Ref(Generic[T]):
-    r: T | RefRange[T]
+    value: T | RefRange[T]
 
-    def __call__(self) -> T | RefRange[T]:
-        return self.r
+    @property
+    def start(self):
+        return self.value.start if isinstance(self.value, RefRange) else self.value
+
+    @property
+    def end(self):
+        return self.value.end if isinstance(self.value, RefRange) else self.value
 
     def __eq__(self, other: object) -> bool:
         match other:
             case Ref():
-                return self.r == other.r
+                return self.value == other.value
             case RefPoint() | RefRange():
-                return self.r == other
+                return self.value == other
         return False
 
-    def __lt__(self, other: Self | None) -> bool:
-        a: RefPoint
+    def __lt__(self, other: Self | T | RefRange[T] | None) -> bool:
+        a = self.start
         b: RefPoint
-        if other is None:
-            return True
-        match other():
+        match other:
+            case Ref() as r:
+                b = r.start
             case RefPoint() as rp:
                 b = rp
             case RefRange() as rr:
                 b = rr.start
-        match self():
-            case RefRange() as rr:
-                a = rr.end
-            case RefPoint() as rp:
-                a = rp
+            case _:
+                return False
         return a < b
 
     def __contains__(self, obj: object) -> bool:
-        return obj in self.r
+        return obj in self.value
+
+    def __str__(self) -> str:
+        return str(self.value)
 
     @classmethod
     def parse(cls, ref_cls, string: str) -> Self:

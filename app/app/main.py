@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
 from .logger import get_logger_config
-from .routers import corpus
+from . import corpus
 
 app = FastAPI()
 
@@ -43,6 +43,8 @@ if __name__ == "__main__":
     uvicorn.run(
         "app.main:app",
         reload=True,
+        reload_dirs=[".", "../pyrrho"],
+        # reload_includes=["*.py", "../pyrrho/*.py"],
         host="0.0.0.0",
         log_level="debug",
         use_colors=True,

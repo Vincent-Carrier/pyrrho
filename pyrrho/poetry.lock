@@ -269,6 +269,18 @@ files = [
 ]
 
 [[package]]
+name = "pycts"
+version = "0.2.2"
+description = ""
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pyCTS-0.2.2-py3-none-any.whl", hash = "sha256:6203c3288b90ee123eb0308848a2b737c85354fa25caca4b27e767b7466fc660"},
+    {file = "pyCTS-0.2.2.tar.gz", hash = "sha256:e68ecebd006c2f4de6a4e4e2d0f77b9b7661c25448eb5be75588f73377f5f3fb"},
+]
+
+[[package]]
 name = "python-dotenv"
 version = "1.0.0"
 description = "Read key-value pairs from a .env file and set them as environment variables"
@@ -326,4 +338,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "37810fe4e2be31b156f10f50398807f45a5b6da45406b498dc6ddf3d63e2a14f"
+content-hash = "9c2ae996f7e361572d51cf17ab06fabba56d568f2a2116089460f0dd6d264186"

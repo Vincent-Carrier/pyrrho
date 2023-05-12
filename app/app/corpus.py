@@ -4,7 +4,8 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import HTMLResponse
 
 import pyrrho.corpus as corpus
-from pyrrho import StandaloneRenderer, Treebank
+from pyrrho.render import StandaloneRenderer
+from pyrrho.treebank import Treebank
 
 router = APIRouter()
 
