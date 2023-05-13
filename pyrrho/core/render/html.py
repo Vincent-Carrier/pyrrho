@@ -38,7 +38,7 @@ class HtmlRenderer(metaclass=ABCMeta):
                     if len(paragraph):
                         container += paragraph
                 case FT.LINE_BREAK:
-                    h.br()
+                    sentence += h.br()
                 case None:
                     pass
                 case _:

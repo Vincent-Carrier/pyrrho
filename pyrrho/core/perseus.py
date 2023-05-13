@@ -4,9 +4,10 @@ from pathlib import Path
 from typing import Iterator, Self, Type, cast, final
 
 from lxml import etree
+from pyCTS import CTS_URN
 
 from .constants import LSJ
-from .ref import Ref, RefPoint, RefRange, T
+from .ref import Ref, RefPoint, T
 from .token import FormatToken
 from .treebank import Token, Treebank
 from .utils import at, parse_int
@@ -35,58 +36,68 @@ class TB(Treebank[T]):
             if gorman:
                 self.body = root
             else:
-                self.body = root.find(".//body")  # type: ignore
-            assert self.body is not None
+                self.body = cast(etree._Element, root.find(".//body"))
 
             self.meta.urn = root.attrib.get("cts")
             if self.meta.urn is None:
-                self.meta.urn = self.body.find("./sentence").attrib.get("document_id")  # type: ignore
+                self.meta.urn = self.body.find("./sentence").get("document_id")  # type: ignore
             if self.meta.urn:
                 self.meta.urn = self.normalize_urn(self.meta.urn)
 
             self.refs = [
-                self.parse_ref(ref)
+                self.parse_ref(r)
                 for sentence in self.body.findall("./sentence")
-                if (r := sentence.attrib.get("subdoc")) is not None
-                and (ref := str(r)) != ""
+                if (r := sentence.get("subdoc")) is not None
             ]
 
     def __getitem__(self, ref: Ref | str) -> Self:
         if isinstance(ref, str):
             return self[self.parse_ref(ref)]
-        match ref.value:
-            case RefRange() | RefPoint() as r:
-                if ref not in self:
-                    raise KeyError(f"Cannot find {ref} in {self}")
-                tb = copy(self)
-                tb.ref = ref
-                return tb
-            case _:
-                raise TypeError(f"Cannot get {ref} from {self}")
+        if ref not in self:
+            raise KeyError(f"Cannot find {ref} in {repr(self)}")
+        nearest = self.nearest(ref)
+        if nearest != ref:
+            print(f"Warning: {ref} not found, using {nearest}")
+        tb = copy(self)
+        tb.ref = nearest
+        return tb
 
-    def __contains__(self, ref: Ref) -> bool:
-        return True  # TODO
+    def __contains__(self, r: Ref) -> bool:
+        return any(r in ref for ref in self.refs)
+
+    def nearest(self, r: Ref) -> Ref:
+        return next(ref for ref in self.refs if r in ref)
 
     def sentences(self) -> Iterator[etree._Element]:
         if self.ref:
-            match self.ref.value:
-                case RefRange() as rr:
-                    yield self.body.find(f"./sentence[@subdoc='{rr.start}']")  # type: ignore
-                    path = f"./sentence[@subdoc='{rr.start}']/following-sibling::sentence"
-                    for s in cast(Iterator[etree._Element], self.body.xpath(path)):  
-                        if self.parse_ref(s.get("subdoc")) > rr.end:  # type: ignore
-                            break
-                        yield s
-                case RefPoint() as rp:
-                    yield self.body.find(f"./sentence[@subdoc='{rp}']")  # type: ignore
+            nearest = self.nearest(self.ref)
+            el = self.body.find(f"./sentence[@subdoc='{nearest}']")
+            if el is None:
+                raise KeyError(
+                    f"Could not find ./sentence[@subdoc='{nearest}' in {repr(self)}]"
+                )
+            yield el
+            path = f"./sentence[@subdoc='{nearest}']/following-sibling::sentence"
+            for sentence in cast(Iterator[etree._Element], self.body.xpath(path)):
+                if self.parse_ref(sentence.attrib["subdoc"]) > self.ref.end:  # type: ignore
+                    return
+                yield sentence
         else:
             yield from self.body.findall("./sentence")
 
     def __iter__(self) -> Iterator[Token]:
-        # TODO: yield paragraph tokens
-        for s in self.sentences():
+        prev_ref: Ref | None = None
+        for sentence in self.sentences():
             yield FormatToken.SENTENCE_START
-            yield from (w for el in s.findall("./word") if (w := self.word(el.attrib)))
+            for el in sentence.findall("./word"):
+                word = self.word(el.attrib)
+                # TODO: yield paragraph tokens
+                if word: 
+                    if word.ref and word.ref > prev_ref:
+                        yield FormatToken.LINE_BREAK
+                        prev_ref = word.ref
+                    yield word
+                
             yield FormatToken.SENTENCE_END
 
     def normalize_urn(self, urn: str | bytes) -> str:
@@ -95,20 +106,19 @@ class TB(Treebank[T]):
     def word(self, attr) -> Word | None:
         if attr.get("insertion_id") is not None:  # TODO
             return None
-
         tags = attr.get("postag")
         pos = POS.parse_agldt(at(tags, 0))
         case = Case.parse_agldt(at(tags, 7))
-
         lemma = attr.get("lemma")
         if lemma:
             lemma = re.sub(r"\d+$", "", lemma)
-
         ref = None
         cite = attr.get("cite")
         if cite:
-            pass
-
+            first = cite.split(" ")[0]
+            urn = CTS_URN(first)
+            ref_str = cast(str, urn.passage_component)
+            ref = Ref(self.ref_cls.parse(ref_str))
         return Word(
             id=parse_int(attr.get("id")),
             head=parse_int(attr.get("head")),
@@ -118,6 +128,7 @@ class TB(Treebank[T]):
             case=case,
             flags=tags,
             definition=lsj.get(lemma) if lemma else None,
+            ref=ref,
         )
 
 

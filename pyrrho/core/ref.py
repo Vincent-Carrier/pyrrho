@@ -92,8 +92,8 @@ class Ref(Generic[T]):
                 return False
         return a < b
 
-    def __contains__(self, obj: object) -> bool:
-        return obj in self.value
+    def __contains__(self, r: Self) -> bool:
+        return self.start <= r.start <= r.end <= self.end
 
     def __str__(self) -> str:
         return str(self.value)

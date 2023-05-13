@@ -7,7 +7,7 @@ function $deps(word) {
   return $(Array.from(deps(word)))
 }
 
-function* deps(word, opacity = 1) {
+function* deps(word) {
   const ds = Array.from(
     word
       .closest('.sentence')
@@ -15,8 +15,7 @@ function* deps(word, opacity = 1) {
   )
   yield word
   for (const d of ds) {
-    d.style = `--tw-bg-opacity: ${opacity};`
-    yield* deps(d, opacity - 0.15)
+    yield * deps(d)
     yield d
   }
 }

@@ -2,10 +2,24 @@ from typing import Callable
 
 from .. import nt, perseus
 from ..constants import AG
-from ..ref import BCV
+from ..ref import BCV, CV, Line
 from ..treebank import Treebank
 
 corpus: dict[str, Callable[[], Treebank]] = {
+    "iliad": lambda: perseus.TB(
+        AG / "perseus/2.1/iliad.xml",
+        ref_cls=CV,
+        title="Iliad",
+        author="Homer",
+        format="verse",
+    ),
+    "persians": lambda: perseus.TB(
+        AG / "perseus/2.1/persians.xml",
+        ref_cls=Line,
+        title="Persians",
+        author="Aeschylus",
+        format="verse",
+    ),
     "histories": lambda: perseus.TB(
         AG / "perseus/2.1/thucydides.xml",
         ref_cls=BCV,
