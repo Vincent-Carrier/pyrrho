@@ -1,4 +1,5 @@
-from abc import ABCMeta
+from abc import ABC
+from functools import singledispatch
 from typing import Iterable, final
 
 import dominate.tags as h
@@ -9,11 +10,17 @@ from ..token import PUNCTUATION
 from ..token import FormatToken as FT
 from ..token import Token
 from ..treebank import Treebank
-from ..word import Word
+from ..utils import cx
+from ..word import POS, Word
 
 
-class HtmlRenderer(metaclass=ABCMeta):
-    def body(self, tokens: Iterable[Token]) -> h.pre:
+class HtmlRenderer(ABC):
+    tb: Treebank
+
+    def __init__(self, tb: Treebank) -> None:
+        self.tb = tb
+
+    def body(self, tokens: Iterable[Token]) -> h.html_tag:
         prev: Word | None = None
         sentence = h.span(cls="sentence")
         paragraph = h.p()
@@ -21,12 +28,13 @@ class HtmlRenderer(metaclass=ABCMeta):
 
         for t in tokens:
             match t:
-                case Word() as w:
-                    ws = " " if prev and (w.form not in PUNCTUATION) else ""
-                    sentence += w.render(ws)
-                    prev = w
-                case RefPoint() as r:
-                    sentence += r.render()
+                case Word() as word:
+                    if prev and (word.form not in PUNCTUATION):
+                        word.left_pad = " "
+                    sentence += render(word)
+                    prev = word
+                case RefPoint() as rp:
+                    sentence += render(rp)
                 case FT.SENTENCE_START:
                     sentence = h.span(cls="sentence")
                 case FT.SENTENCE_END:
@@ -48,19 +56,43 @@ class HtmlRenderer(metaclass=ABCMeta):
         return container
 
 
+@singledispatch
+def render(obj) -> h.html_tag:
+    ...
+
+
+@render.register(Word)
+def _(word: Word) -> h.html_tag:
+    return h.span(
+        f"{word.left_pad}{word.form}",
+        cls=cx(word.case, word.pos == POS.verb and word.pos),
+        data_id=str(word.id),
+        data_head=str(word.head),
+        data_lemma=word.lemma,
+        data_flags=word.flags,
+        data_def=word.definition,
+    )
+
+
+@render.register(RefPoint)
+def _(ref: RefPoint) -> h.html_tag:
+    return h.span(str(ref), cls="ref")
+
+
 @final
 class StandaloneRenderer(HtmlRenderer):
-    def render(self, tb: Treebank) -> str:
-        return self.document(tb).render()
+    def __str__(self) -> str:
+        return self.document(self.tb).render()
 
     def document(self, tb) -> document:
         doc = document(title=tb.meta.title)
         pre = self.body(iter(tb))
+        text = h.div(pre, cls=f"{tb.meta.format}-format")
         with doc.head:  # type: ignore
             h.meta(name="author", content=tb.meta.author)
             h.link(rel="stylesheet", href="/static/styles.css")
         with doc:
-            doc.add(pre)
+            doc.add(text)
             h.script(
                 src="https://cdnjs.cloudflare.com/ajax/libs/cash/8.1.5/cash.min.js"
             )

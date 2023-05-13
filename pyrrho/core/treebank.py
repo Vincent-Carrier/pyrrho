@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Generic, Iterator, Literal, Self, Type
 
@@ -18,7 +18,7 @@ class Metadata:
     format: Format = "prose"
 
 
-class Treebank(Generic[T], metaclass=ABCMeta):
+class Treebank(Generic[T], ABC):
     meta: Metadata
     ref_cls: Type[RefPoint]
     ref: Ref | None = None
@@ -44,17 +44,17 @@ class Treebank(Generic[T], metaclass=ABCMeta):
         tokens = []
         for t in iter(self):
             match t:
-                case Word() as w:
-                    if prev and w.form not in PUNCTUATION:
-                        tokens.append(" ")
-                    tokens.append(w.form)
-                    prev = w
+                case Word() as word:
+                    if prev and word.form not in PUNCTUATION:
+                        word.left_pad = " "
+                    tokens.append(str(word))
+                    prev = word
                 case FormatToken.LINE_BREAK | FormatToken.PARAGRAPH_END:
                     tokens.append("\n")
         return "".join(tokens)
     
     def __repr__(self) -> str:
-        return f"<{self.__class__.__name__} title={self.meta.title} ref={self.ref}>"
+        return f"<{self.__class__.__name__} title='{self.meta.title}' ref={self.ref}>"
 
     def parse_ref(self, ref: str) -> Ref[T]:
         return Ref.parse(self.ref_cls, ref)

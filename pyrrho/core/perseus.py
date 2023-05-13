@@ -54,7 +54,7 @@ class TB(Treebank[T]):
         if isinstance(ref, str):
             return self[self.parse_ref(ref)]
         if ref not in self:
-            raise KeyError(f"Cannot find {ref} in {repr(self)}")
+            raise KeyError(f"Cannot find {ref} in {self!r}")
         nearest = self.nearest(ref)
         if nearest != ref:
             print(f"Warning: {ref} not found, using {nearest}")
@@ -74,7 +74,7 @@ class TB(Treebank[T]):
             el = self.body.find(f"./sentence[@subdoc='{nearest}']")
             if el is None:
                 raise KeyError(
-                    f"Could not find ./sentence[@subdoc='{nearest}' in {repr(self)}]"
+                    f"Could not find ./sentence[@subdoc='{nearest}' in {self!r}]"
                 )
             yield el
             path = f"./sentence[@subdoc='{nearest}']/following-sibling::sentence"
@@ -94,7 +94,8 @@ class TB(Treebank[T]):
                 # TODO: yield paragraph tokens
                 if word: 
                     if word.ref and word.ref > prev_ref:
-                        yield FormatToken.LINE_BREAK
+                        if self.meta.format == "prose":
+                            yield FormatToken.LINE_BREAK
                         prev_ref = word.ref
                     yield word
                 

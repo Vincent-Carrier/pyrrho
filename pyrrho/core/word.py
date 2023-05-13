@@ -2,10 +2,7 @@ from dataclasses import dataclass
 from enum import StrEnum, auto
 from typing import Self
 
-from dominate.tags import span
-
 from .ref import Ref
-from .utils import cx
 
 
 class POS(StrEnum):
@@ -111,7 +108,7 @@ _case_conll = {
 }
 
 
-@dataclass
+@dataclass(slots=True)
 class Word:
     form: str
     id: int | None
@@ -122,14 +119,7 @@ class Word:
     flags: str | None = None
     definition: str | None = None
     ref: Ref | None = None
+    left_pad: str = ""
 
-    def render(self: Self, whitespace: str = "") -> span:
-        return span(
-            f"{whitespace}{self.form}",
-            cls=cx(self.case, self.pos == POS.verb and self.pos),
-            data_id=str(self.id),
-            data_head=str(self.head),
-            data_lemma=self.lemma,
-            data_flags=self.flags,
-            data_def=self.definition,
-        )
+    def __str__(self) -> str:
+        return f"{self.left_pad}{self.form}"

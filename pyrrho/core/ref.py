@@ -1,11 +1,11 @@
-from abc import ABCMeta
+from abc import ABC
 from dataclasses import astuple, dataclass
 from functools import total_ordering
 from typing import Generic, Self, Type, TypeVar, final
 
 
 @dataclass(order=True, frozen=True, slots=True)
-class RefPoint(metaclass=ABCMeta):
+class RefPoint(ABC):
     @classmethod
     def parse(cls, ref: str) -> Self:
         return cls(*(int(x) for x in ref.split(".")))

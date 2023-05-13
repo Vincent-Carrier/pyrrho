@@ -56,7 +56,7 @@ class GntTreebank(conll.TB[BCV]):
                 if self.ref and self.ref < w.ref:
                     raise StopIteration
                 if w.ref and w.ref != ref:
-                    wref = cast(BCV, w.ref())
+                    wref = cast(BCV, w.ref.value)
                     yield wref
                     ref = wref
                 yield w

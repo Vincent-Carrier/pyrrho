@@ -23,15 +23,13 @@ router = APIRouter()
 #         case _:
 #             return HTTPException(status_code=404, detail=f"Unknown language {lang}")
 
-renderer = StandaloneRenderer()
-
 
 @router.get("/{lang}/{slug}", response_class=HTMLResponse)
 async def get_treebank(lang: str, slug: str, ref: str | None = None):
     if (tb := _get_treebank(slug)) is not None:
         if ref is not None:
             tb = tb[ref]
-        return renderer.render(tb)
+        return str(StandaloneRenderer(tb))
     else:
         raise HTTPException(status_code=404, detail=f"Unknown treebank {slug}")
 
