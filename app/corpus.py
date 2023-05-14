@@ -3,9 +3,9 @@ from functools import cache
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import HTMLResponse
 
-from pyrrho.core import corpus
-from pyrrho.core.render import StandaloneRenderer
-from pyrrho.core.treebank import Treebank
+from core import corpus
+from core.render import StandaloneRenderer
+from core.treebank import Treebank
 
 router = APIRouter()
 
