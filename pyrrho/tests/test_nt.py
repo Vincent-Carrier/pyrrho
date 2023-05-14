@@ -1,6 +1,6 @@
-from ..constants import AG
-from ..corpus.ag import corpus
-from .nt import GntTreebank
+from pyrrho.core.constants import AG
+from pyrrho.core.corpus.ag import corpus
+from pyrrho.core.nt.nt import GntTreebank
 
 tb = GntTreebank(
     AG / "new-testament.conllu",

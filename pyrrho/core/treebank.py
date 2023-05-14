@@ -1,12 +1,14 @@
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
-from typing import Generic, Iterator, Literal, Self, Type
+from typing import Callable, Generic, Iterator, Literal, Self, Type
 
+from .constants import PUNCTUATION
 from .ref import Ref, RefPoint, T
-from .token import PUNCTUATION, FormatToken, Token
+from .token import FormatToken, Token
 from .word import Word
 
 Format = Literal["prose", "verse"]
+
 
 
 @dataclass(slots=True)
@@ -18,14 +20,21 @@ class Metadata:
     format: Format = "prose"
 
 
-class Treebank(Generic[T], ABC):
+class Treebank(Generic[T], metaclass=ABCMeta):
     meta: Metadata
     ref_cls: Type[RefPoint]
     ref: Ref | None = None
+    chunks: Callable[[Self], Iterator[Self]]
 
-    def __init__(self, ref_cls: Type[RefPoint], **kwargs) -> None:
+    def __init__(
+        self,
+        ref_cls: Type[RefPoint],
+        chunks: Callable[[Self], Iterator[Self]] | None = None,
+        **kwargs,
+    ) -> None:
         self.meta = Metadata(**kwargs)
         self.ref_cls = ref_cls
+        self.chunks = chunks or (lambda self: iter([self]))
 
     @abstractmethod
     def __getitem__(self, ref: Ref | str) -> Self:
@@ -40,21 +49,23 @@ class Treebank(Generic[T], ABC):
         ...
 
     def __str__(self) -> str:
-        prev: Word | None = None
-        tokens = []
-        for t in iter(self):
-            match t:
-                case Word() as word:
-                    if prev and word.form not in PUNCTUATION:
-                        word.left_pad = " "
-                    tokens.append(str(word))
-                    prev = word
-                case FormatToken.LINE_BREAK | FormatToken.PARAGRAPH_END:
-                    tokens.append("\n")
-        return "".join(tokens)
-    
+        def tokens() -> Iterator[str]:
+            prev: Word | None = None
+            for t in iter(self):
+                match t:
+                    case Word() as word:
+                        if prev and word.form not in PUNCTUATION:
+                            word.left_pad = " "
+                        yield str(word)
+                        prev = word
+                    case FormatToken.LINE_BREAK | FormatToken.PARAGRAPH_END:
+                        yield "\n"
+
+        return "".join(tokens())
+
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} title='{self.meta.title}' ref={self.ref}>"
 
     def parse_ref(self, ref: str) -> Ref[T]:
         return Ref.parse(self.ref_cls, ref)
+

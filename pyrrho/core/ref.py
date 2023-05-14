@@ -1,11 +1,11 @@
-from abc import ABC
+from abc import ABCMeta
 from dataclasses import astuple, dataclass
 from functools import total_ordering
 from typing import Generic, Self, Type, TypeVar, final
 
 
 @dataclass(order=True, frozen=True, slots=True)
-class RefPoint(ABC):
+class RefPoint(metaclass=ABCMeta):
     @classmethod
     def parse(cls, ref: str) -> Self:
         return cls(*(int(x) for x in ref.split(".")))
@@ -26,9 +26,6 @@ class RefPoint(ABC):
                 return False
         return True
 
-    def render(self):
-        ...
-
 
 T = TypeVar("T", bound=RefPoint)
 
@@ -38,6 +35,9 @@ T = TypeVar("T", bound=RefPoint)
 class RefRange(Generic[T]):
     start: T
     end: T
+
+    def __post_init__(self) -> None:
+        assert self.start <= self.end
 
     @classmethod
     def parse(cls, ref_cls: Type[T], ref: str) -> Self:
@@ -63,11 +63,11 @@ class Ref(Generic[T]):
     value: T | RefRange[T]
 
     @property
-    def start(self):
+    def start(self) -> T:
         return self.value.start if isinstance(self.value, RefRange) else self.value
 
     @property
-    def end(self):
+    def end(self) -> T:
         return self.value.end if isinstance(self.value, RefRange) else self.value
 
     def __eq__(self, other: object) -> bool:
@@ -79,7 +79,7 @@ class Ref(Generic[T]):
         return False
 
     def __lt__(self, other: Self | T | RefRange[T] | None) -> bool:
-        a = self.start
+        a: RefPoint = self.start
         b: RefPoint
         match other:
             case Ref() as r:
@@ -97,6 +97,9 @@ class Ref(Generic[T]):
 
     def __str__(self) -> str:
         return str(self.value)
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.value})"
 
     @classmethod
     def parse(cls, ref_cls, string: str) -> Self:

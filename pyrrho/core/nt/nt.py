@@ -54,11 +54,10 @@ class GntTreebank(conll.TB[BCV]):
             for word in sentence:
                 w = self.word(word)
                 if self.ref and self.ref < w.ref:
-                    raise StopIteration
+                    return
                 if w.ref and w.ref != ref:
-                    wref = cast(BCV, w.ref.value)
-                    yield wref
-                    ref = wref
+                    yield w.ref
+                    ref = cast(BCV, w.ref.value)
                 yield w
             yield FormatToken.SENTENCE_END
 

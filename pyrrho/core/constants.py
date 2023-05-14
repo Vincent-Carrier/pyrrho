@@ -6,3 +6,4 @@ DATA = ROOT / "data"
 AG = DATA / "ag"
 
 LSJ = lambda: shelve.open(str(AG / "lsj"))
+PUNCTUATION = [".", ",", ";", ":", "·", "]", ")"]

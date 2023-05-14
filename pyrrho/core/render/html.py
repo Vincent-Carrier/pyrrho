@@ -1,12 +1,12 @@
-from abc import ABC
+from abc import ABCMeta
 from functools import singledispatch
 from typing import Iterable, final
 
 import dominate.tags as h
 from dominate import document
 
-from ..ref import RefPoint
-from ..token import PUNCTUATION
+from ..constants import PUNCTUATION
+from ..ref import Ref
 from ..token import FormatToken as FT
 from ..token import Token
 from ..treebank import Treebank
@@ -14,7 +14,7 @@ from ..utils import cx
 from ..word import POS, Word
 
 
-class HtmlRenderer(ABC):
+class HtmlRenderer(metaclass=ABCMeta):
     tb: Treebank
 
     def __init__(self, tb: Treebank) -> None:
@@ -33,8 +33,8 @@ class HtmlRenderer(ABC):
                         word.left_pad = " "
                     sentence += render(word)
                     prev = word
-                case RefPoint() as rp:
-                    sentence += render(rp)
+                case Ref() as ref:
+                    sentence += render(ref)
                 case FT.SENTENCE_START:
                     sentence = h.span(cls="sentence")
                 case FT.SENTENCE_END:
@@ -74,8 +74,10 @@ def _(word: Word) -> h.html_tag:
     )
 
 
-@render.register(RefPoint)
-def _(ref: RefPoint) -> h.html_tag:
+@render.register(Ref)
+def _(ref: Ref) -> h.html_tag:
+    if hasattr(ref.value, "render"):
+        return ref.value.render()  # type: ignore
     return h.span(str(ref), cls="ref")
 
 

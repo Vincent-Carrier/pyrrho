@@ -1,7 +1,7 @@
 from enum import Enum, auto
 from typing import TypeAlias
 
-from .ref import RefPoint
+from .ref import Ref
 from .word import Word
 
 
@@ -13,8 +13,4 @@ class FormatToken(Enum):
     LINE_BREAK = auto()
 
 
-FT = FormatToken
-
-Token: TypeAlias = Word | RefPoint | FormatToken
-
-PUNCTUATION = [".", ",", ";", ":", "·", "]", ")"]
+Token: TypeAlias = Word | Ref | FormatToken

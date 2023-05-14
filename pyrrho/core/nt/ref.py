@@ -2,7 +2,7 @@ from dataclasses import dataclass, replace
 from itertools import groupby
 from typing import Iterable, Self, final
 
-from dominate.tags import span
+import dominate.tags as h
 from ordered_enum import OrderedEnum  # type: ignore
 
 from ..ref import RefPoint
@@ -61,11 +61,11 @@ class BCV(RefPoint):
         assert self.chapter > 0
         return self.verse != 0
 
-    def render(self) -> span:
+    def render(self) -> h.html_tag:
         if self.is_chapter:
-            return span(self.chapter, cls="chapter")
+            return h.span(self.chapter, cls="chapter")
         elif self.is_verse:
-            return span(self.verse, cls="verse")
+            return h.span(self.verse, cls="verse")
         else:
             raise ValueError("cannot render {self}")
 

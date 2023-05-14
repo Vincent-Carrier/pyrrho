@@ -1,6 +1,6 @@
 from pytest import mark
 
-from .ref import BCV, CV, Book, RefPoint, RefRange
+from pyrrho.core.ref import BCV, CV, RefPoint, RefRange
 
 eq_tests = [
     (BCV(1, 1, 1), BCV(1, 1, 1), True),
@@ -40,8 +40,6 @@ def test_parse():
     assert BCV.parse("1.1") == BCV(1, 1, None)
     assert CV.parse("1.1") == CV(1, 1)
     assert CV.parse("1") == CV(1)
-    assert BCV.parse("MATT_1.1") == BCV(Book('MATT'), 1, 1)
-    assert BCV.parse("MATT_1") == BCV(Book('MATT'), 1, 0)
 
 def test_parse_range():
     assert RefRange.parse(BCV, "1.1.1-1.1.2") == RefRange(BCV(1, 1, 1), BCV(1, 1, 2))

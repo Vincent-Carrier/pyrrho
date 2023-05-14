@@ -1,4 +1,4 @@
-from ctypes import cast
+import sys
 from typing import Any, TypeVar
 
 T = TypeVar('T')
@@ -19,3 +19,5 @@ def cx(*args: Any) -> str | None:
 def invert(d: dict[T, U]) -> dict[U, T]:
     return {v: k for k, v in d.items()}
 
+def eprint(*args: Any) -> None:
+    print(*args, file=sys.stderr)

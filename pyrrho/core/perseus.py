@@ -10,7 +10,7 @@ from .constants import LSJ
 from .ref import Ref, RefPoint, T
 from .token import FormatToken
 from .treebank import Token, Treebank
-from .utils import at, parse_int
+from .utils import at, eprint, parse_int
 from .word import POS, Case, Word
 
 
@@ -57,7 +57,7 @@ class TB(Treebank[T]):
             raise KeyError(f"Cannot find {ref} in {self!r}")
         nearest = self.nearest(ref)
         if nearest != ref:
-            print(f"Warning: {ref} not found, using {nearest}")
+            eprint(f"Warning: {ref} not found, using {nearest}")
         tb = copy(self)
         tb.ref = nearest
         return tb
