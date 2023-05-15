@@ -1,6 +1,6 @@
 from pytest import mark
 
-from pyrrho.core.ref import BCV, CV, RefPoint, RefRange
+from core.ref import BCV, CV, RefPoint, RefRange
 
 eq_tests = [
     (BCV(1, 1, 1), BCV(1, 1, 1), True),

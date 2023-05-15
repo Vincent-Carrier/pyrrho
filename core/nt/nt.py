@@ -53,7 +53,7 @@ class GntTreebank(conll.TB[BCV]):
             yield FormatToken.SENTENCE_START
             for word in sentence:
                 w = self.word(word)
-                if self.ref and self.ref < w.ref:
+                if w.ref and self.ref and w.ref not in self.ref:
                     return
                 if w.ref and w.ref != ref:
                     yield w.ref
