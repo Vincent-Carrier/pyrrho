@@ -45,5 +45,5 @@ class TB(Generic[T], Treebank[T]):
             lemma=t.lemma,
             definition=lsj.get(t.lemma) if t.lemma else None,
             pos=POS.parse_conll(t.upos),
-            case=(c := t.feats and t.feats.get("Case")) and Case.parse_conll(next(iter(c))),  # type: ignore
+            case=(c := t.feats and t.feats.get("Case") or None) and Case.parse_conll(next(iter(c))),  # type: ignore
         )

@@ -55,4 +55,4 @@ def _(word: Word) -> None:
 
 @render.register(Ref)
 def _(ref: Ref) -> None:
-    console.print(" — ", end="", style="white")
+    console.print("— ", end="", style="white")
