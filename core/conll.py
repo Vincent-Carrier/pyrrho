@@ -1,15 +1,15 @@
 from pathlib import Path
-from typing import Any, Generic, Iterator, Type
+from typing import Generic, Iterator, Type
 
 import pyconll
 from pyconll.unit.conll import Conll
 from pyconll.unit.token import Token as ConllToken
 
-from .constants import LSJ
-from .ref import Ref, T
-from .token import FT
-from .treebank import Token, Treebank
-from .word import POS, Case, Word
+from core.constants import LSJ
+from core.ref import Ref, T
+from core.token import FT
+from core.treebank import Token, Treebank
+from core.word import POS, Case, Word
 
 lsj = LSJ()
 

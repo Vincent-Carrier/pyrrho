@@ -5,8 +5,8 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from . import corpus
-from .logger import get_logger_config
+from app import corpus
+from app.logger import get_logger_config
 
 app = FastAPI()
 

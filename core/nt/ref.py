@@ -5,7 +5,7 @@ from typing import Iterable, Self, final
 import dominate.tags as h
 from ordered_enum import OrderedEnum  # type: ignore
 
-from ..ref import RefPoint
+from core.ref import RefPoint
 
 
 class Book(OrderedEnum):

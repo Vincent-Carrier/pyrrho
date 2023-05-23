@@ -22,7 +22,7 @@ class HtmlRenderer(metaclass=ABCMeta):
     def body(self, tokens: Iterable[Token]) -> h.html_tag:
         sentence = h.span(cls="sentence")
         paragraph = h.p()
-        container = h.pre(cls="treebank syntax")
+        container = h.div(cls="treebank syntax")
 
         for t in tokens:
             match t:

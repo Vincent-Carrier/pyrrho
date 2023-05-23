@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import StrEnum, auto
-from typing import Optional, Union
+from typing import Optional
 
 from core.ref import Ref
 

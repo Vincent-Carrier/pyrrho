@@ -1,16 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Alegreya&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Alegreya:wght=400..900&display=swap');
 
 body {
 	max-width: 65ch;
-	margin: 4em auto;
+	margin: 2em;
 	line-height: 1.7;
 	font-size: 1.4em;
 	color: #333;
-}
-
-pre { 
 	font-family: 'Alegreya', serif;
-	white-space: pre-line;
 }
 
 p { white-space: normal; }
@@ -20,7 +16,7 @@ p { white-space: normal; }
 .verse { font-size: 0.8em; padding-left: 0.5em; padding-right: 0.8em; color: #666; }
 .prose-format .sentence:not(:last-child)::after { content: '—'; padding: 0 0.4em; color: #666; }
 
-.verb { font-weight: bold; }
+.verb { font-weight: bolder; }
 .nominative { color: #0d9488; }
 .accusative { color: #2563eb; }
 .genitive { color: #7c3aed; }
