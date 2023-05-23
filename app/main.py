@@ -30,16 +30,14 @@ def langs():
     }
 
 
-if __name__ == "__main__":
+def main():
     logger_config = get_logger_config()
-
     log_config = logging.basicConfig(  # type: ignore
         level=logger_config.level,
         format=logger_config.format,
         datefmt=logger_config.date_format,
         handlers=logger_config.handlers,
     )
-
     uvicorn.run(
         "app.main:app",
         reload=True,
@@ -48,3 +46,7 @@ if __name__ == "__main__":
         use_colors=True,
         log_config=log_config,
     )
+
+
+if __name__ == "__main__":
+    main()

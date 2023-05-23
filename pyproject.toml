@@ -4,6 +4,10 @@ version = "0.1.0"
 description = ""
 authors = ["Vincent Carrier <vincentcarrier15@gmail.com>"]
 
+[tool.poetry.scripts]
+app = "pyrrho.app.main:main"
+cli = "cli:main"
+
 [tool.poetry.dependencies]
 python = "^3.11"
 boltons = "^23.0.0"

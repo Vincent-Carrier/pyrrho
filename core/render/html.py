@@ -73,14 +73,14 @@ def _(word: Word) -> h.html_tag:
 
 @render.register(Ref)
 def _(ref: Ref) -> h.html_tag:
-    if hasattr(ref.value, "render"):
+    if hasattr(ref.value, "render"):  # TODO: use __str__
         return ref.value.render()  # type: ignore
     return h.span(str(ref), cls="ref")
 
 
 @final
 class StandaloneRenderer(HtmlRenderer):
-    def __str__(self) -> str:
+    def render(self) -> str:
         return self.document(self.tb).render()
 
     def document(self, tb) -> document:
