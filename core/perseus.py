@@ -6,12 +6,12 @@ from typing import Iterator, Self, Type, cast, final
 from lxml import etree
 from pyCTS import CTS_URN
 
-from .constants import LSJ
-from .ref import Ref, RefPoint, T
-from .token import FormatToken
-from .treebank import Token, Treebank
-from .utils import at, eprint, parse_int
-from .word import POS, Case, Word
+from core.constants import LSJ, PUNCTUATION
+from core.ref import Ref, T
+from core.token import FT
+from core.treebank import Token, Treebank
+from core.utils import at, eprint, parse_int
+from core.word import POS, Case, Word
 
 
 @final
@@ -23,7 +23,7 @@ class TB(Treebank[T]):
     def __init__(
         self,
         f: Path,
-        ref_cls: Type[RefPoint],
+        ref_cls: Type[T],
         gorman: bool = False,
         **kwargs,
     ) -> None:
@@ -87,19 +87,22 @@ class TB(Treebank[T]):
 
     def __iter__(self) -> Iterator[Token]:
         prev_ref: Ref | None = None
+        prev_form: str = ""
         for sentence in self.sentences():
-            yield FormatToken.SENTENCE_START
+            yield FT.SENTENCE_START
             for el in sentence.findall("./word"):
                 word = self.word(el.attrib)
                 # TODO: yield paragraph tokens
                 if word: 
                     if word.ref and word.ref > prev_ref:
                         if self.meta.format == "prose":
-                            yield FormatToken.LINE_BREAK
+                            yield FT.LINE_BREAK
                         prev_ref = word.ref
+                    if prev_form and (prev_form not in PUNCTUATION):
+                        yield FT.SPACE
+                    prev_form = word.form
                     yield word
-                
-            yield FormatToken.SENTENCE_END
+            yield FT.SENTENCE_END
 
     def normalize_urn(self, urn: str | bytes) -> str:
         return re.search(r"^(urn:cts:greekLit:tlg\d{4}.tlg\d{3}).*", str(urn)).group(1)  # type: ignore

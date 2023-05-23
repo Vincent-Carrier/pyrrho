@@ -1,17 +1,16 @@
 from abc import ABCMeta
 from functools import singledispatch
-from typing import Iterable, final
+from typing import Iterable, assert_never, final
 
 import dominate.tags as h
 from dominate import document
 
-from ..constants import PUNCTUATION
-from ..ref import Ref
-from ..token import FormatToken as FT
-from ..token import Token
-from ..treebank import Treebank
-from ..utils import cx
-from ..word import POS, Word
+from core.ref import Ref
+from core.token import FT as FT
+from core.token import Token
+from core.treebank import Treebank
+from core.utils import cx
+from core.word import POS, Word
 
 
 class HtmlRenderer(metaclass=ABCMeta):
@@ -21,7 +20,6 @@ class HtmlRenderer(metaclass=ABCMeta):
         self.tb = tb
 
     def body(self, tokens: Iterable[Token]) -> h.html_tag:
-        prev: Word | None = None
         sentence = h.span(cls="sentence")
         paragraph = h.p()
         container = h.pre(cls="treebank syntax")
@@ -29,12 +27,11 @@ class HtmlRenderer(metaclass=ABCMeta):
         for t in tokens:
             match t:
                 case Word() as word:
-                    if prev and (word.form not in PUNCTUATION):
-                        word.left_pad = " "
                     sentence += render(word)
-                    prev = word
                 case Ref() as ref:
                     sentence += render(ref)
+                case FT.SPACE:
+                    sentence += " "
                 case FT.SENTENCE_START:
                     sentence = h.span(cls="sentence")
                 case FT.SENTENCE_END:
@@ -50,7 +47,7 @@ class HtmlRenderer(metaclass=ABCMeta):
                 case None:
                     pass
                 case _:
-                    raise ValueError(f"Unknown token type: {t!r}")
+                    assert_never(t)
         if len(paragraph):
             container += paragraph
         return container
@@ -64,7 +61,7 @@ def render(obj) -> h.html_tag:
 @render.register(Word)
 def _(word: Word) -> h.html_tag:
     return h.span(
-        f"{word.left_pad}{word.form}",
+        word.form,
         cls=cx(word.case, word.pos == POS.verb and word.pos),
         data_id=str(word.id),
         data_head=str(word.head),

@@ -101,8 +101,8 @@ class Ref(Generic[T]):
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.value})"
 
-    @classmethod
-    def parse(cls, ref_cls, string: str) -> Self:
+    @staticmethod
+    def parse(ref_cls: Type[T], string: str) -> "Ref[T]":
         r = RefRange.parse(ref_cls, string) if "-" in string else ref_cls.parse(string)
         return Ref(r)  # type: ignore
 

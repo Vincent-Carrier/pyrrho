@@ -1,11 +1,12 @@
 from enum import Enum, auto
 from typing import TypeAlias
 
-from .ref import Ref
-from .word import Word
+from core.ref import Ref
+from core.word import Word
 
 
-class FormatToken(Enum):
+class FT(Enum):  # Formatting Token
+    SPACE = auto()
     SENTENCE_START = auto()
     SENTENCE_END = auto()
     PARAGRAPH_START = auto()
@@ -13,4 +14,4 @@ class FormatToken(Enum):
     LINE_BREAK = auto()
 
 
-Token: TypeAlias = Word | Ref | FormatToken
+Token: TypeAlias = Word | Ref | FT

@@ -3,12 +3,14 @@ from dataclasses import replace
 from pathlib import Path
 from typing import Iterator, Self, cast, final
 
-from .. import conll
-from ..ref import Ref, RefRange
-from ..token import FormatToken
-from ..treebank import Token
-from ..word import Word
-from .ref import BCV, RefTree
+from pyconll.unit.token import Token as ConllToken
+
+from core import conll
+from core.nt.ref import BCV, RefTree
+from core.ref import Ref, RefRange
+from core.token import FT
+from core.treebank import Token
+from core.word import Word
 
 
 @final
@@ -50,22 +52,21 @@ class GntTreebank(conll.TB[BCV]):
     def __iter__(self) -> Iterator[Token]:
         ref: BCV | None = None
         for sentence in self.conll:
-            yield FormatToken.SENTENCE_START
+            yield FT.SENTENCE_START
             for word in sentence:
                 w = self.word(word)
+                yield FT.SPACE
                 if w.ref and self.ref and w.ref not in self.ref:
                     return
                 if w.ref and w.ref != ref:
                     yield w.ref
                     ref = cast(BCV, w.ref.value)
                 yield w
-            yield FormatToken.SENTENCE_END
+            yield FT.SENTENCE_END
 
-    def word(self, word) -> Word:
-        w = super().word(word)
-        w.ref = Ref(self.get_bcv(word))
-        return w
+    def word(self, token: ConllToken) -> Word:
+        return replace(super().word(token), ref=Ref(self.get_bcv(token)))
 
-    def get_bcv(self, word) -> BCV:
-        [r] = iter(word.misc["Ref"])
+    def get_bcv(self, token: ConllToken) -> BCV:
+        [r] = iter(token.misc["Ref"])  # type: ignore
         return BCV.parse(r)

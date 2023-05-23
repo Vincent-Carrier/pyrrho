@@ -13,6 +13,9 @@ python-dotenv = "^1.0.0"
 fastapi = "^0.95.1"
 uvicorn = {extras = ["standard"], version = "^0.21.1"}
 
+# cli
+typer = "^0.9.0"
+
 # lib
 lxml = "^4.9.2"
 dominate = "^2.7.0"

@@ -2,10 +2,12 @@ from pathlib import Path
 from typing import Any, Generic, Iterator, Type
 
 import pyconll
+from pyconll.unit.conll import Conll
+from pyconll.unit.token import Token as ConllToken
 
 from .constants import LSJ
 from .ref import Ref, T
-from .token import FormatToken
+from .token import FT
 from .treebank import Token, Treebank
 from .word import POS, Case, Word
 
@@ -13,7 +15,7 @@ lsj = LSJ()
 
 
 class TB(Generic[T], Treebank[T]):
-    conll: Any
+    conll: Conll
 
     def __init__(
         self,
@@ -26,22 +28,22 @@ class TB(Generic[T], Treebank[T]):
 
     def __iter__(self) -> Iterator[Token]:
         for sentence in self.conll:
-            yield FormatToken.SENTENCE_START
-            yield from (self.word(w) for w in sentence)
-            yield FormatToken.SENTENCE_END
+            yield FT.SENTENCE_START
+            for w in sentence:
+                yield self.word(w)
+                yield FT.SPACE
+            yield FT.SENTENCE_END
 
     def __contains__(self, ref: Ref[T]) -> bool:
         return True  # TODO
 
-    def word(self, w) -> Word:
-        kase = w.feats.get("Case")
-        kase = kase and Case.parse_conll(list(kase)[0])
+    def word(self, t: ConllToken) -> Word:
         return Word(
-            id=w.id,
-            head=w.head,
-            form=w.form,
-            lemma=w.lemma,
-            definition=lsj.get(w.lemma),
-            pos=POS.parse_conll(w.upos),
-            case=kase,
+            id=int(t.id),
+            head=int(t.head) if t.head else None,
+            form=t.form or "",
+            lemma=t.lemma,
+            definition=lsj.get(t.lemma) if t.lemma else None,
+            pos=POS.parse_conll(t.upos),
+            case=(c := t.feats and t.feats.get("Case")) and Case.parse_conll(next(iter(c))),  # type: ignore
         )

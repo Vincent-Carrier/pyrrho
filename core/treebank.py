@@ -2,10 +2,9 @@ from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from typing import Callable, Generic, Iterator, Literal, Self, Type
 
-from .constants import PUNCTUATION
-from .ref import Ref, RefPoint, T
-from .token import FormatToken, Token
-from .word import Word
+from core.ref import Ref, T
+from core.token import FT, Token
+from core.word import Word
 
 Format = Literal["prose", "verse"]
 
@@ -22,13 +21,13 @@ class Metadata:
 
 class Treebank(Generic[T], metaclass=ABCMeta):
     meta: Metadata
-    ref_cls: Type[RefPoint]
+    ref_cls: Type[T]
     ref: Ref | None = None
     chunks: Callable[[Self], Iterator[Self]]
 
     def __init__(
         self,
-        ref_cls: Type[RefPoint],
+        ref_cls: Type[T],
         chunks: Callable[[Self], Iterator[Self]] | None = None,
         **kwargs,
     ) -> None:
@@ -49,19 +48,18 @@ class Treebank(Generic[T], metaclass=ABCMeta):
         ...
 
     def __str__(self) -> str:
-        def tokens() -> Iterator[str]:
-            prev: Word | None = None
-            for t in iter(self):
-                match t:
-                    case Word() as word:
-                        if prev and word.form not in PUNCTUATION:
-                            word.left_pad = " "
-                        yield str(word)
-                        prev = word
-                    case FormatToken.LINE_BREAK | FormatToken.PARAGRAPH_END:
-                        yield "\n"
+        def render(t: Token) -> str:
+            match t:
+                case Word() as word:
+                    return str(word)
+                case FT.SPACE:
+                    return " "
+                case FT.LINE_BREAK | FT.PARAGRAPH_END:
+                    return "\n"
+                case _:
+                    return ""
 
-        return "".join(tokens())
+        return "".join(render(t) for t in iter(self))
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} title='{self.meta.title}' ref={self.ref}>"

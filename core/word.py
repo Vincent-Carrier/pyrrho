@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from enum import StrEnum, auto
-from typing import Self
+from typing import Optional, Union
 
-from .ref import Ref
+from core.ref import Ref
 
 
 class POS(StrEnum):
@@ -21,17 +21,49 @@ class POS(StrEnum):
     exclamation = auto()
     punctuation = auto()
 
-    @classmethod
-    def parse_agldt(cls, pos: str | None) -> Self | None:
-        if pos is None:
-            return None
-        return _pos_agldt.get(pos)  # type: ignore
-    
-    @classmethod
-    def parse_conll(cls, pos: str | None) -> Self | None:
-        if pos is None:
-            return None
-        return _pos_conll.get(pos)  # type: ignore
+    @staticmethod
+    def parse_agldt(pos: str | None) -> Optional["POS"]:
+        pairings = {
+            "n": POS.noun,
+            "v": POS.verb,
+            "t": POS.participle,
+            "a": POS.adjective,
+            "d": POS.adverb,
+            "l": POS.article,
+            "g": POS.particle,
+            "c": POS.conjunction,
+            "r": POS.preposition,
+            "p": POS.pronoun,
+            "m": POS.numeral,
+            "i": POS.interjection,
+            "e": POS.exclamation,
+            "u": POS.punctuation,
+            "-": None,
+        }
+        return pairings.get(pos) if pos else None
+
+    @staticmethod
+    def parse_conll(pos: str | None) -> Optional["POS"]:
+        pairings = {
+            "ADJ": POS.adjective,
+            "ADP": POS.preposition,
+            "ADV": POS.adverb,
+            "AUX": POS.verb,
+            "CCONJ": POS.conjunction,
+            "DET": POS.article,
+            "INTJ": POS.interjection,
+            "NOUN": POS.noun,
+            "NUM": POS.numeral,
+            "PART": POS.particle,
+            "PRON": POS.pronoun,
+            "PROPN": POS.noun,
+            "PUNCT": POS.punctuation,
+            "SCONJ": POS.conjunction,
+            "SYM": None,
+            "VERB": POS.verb,
+            "X": None,
+        }
+        return pairings.get(pos) if pos else None
 
 
 class Case(StrEnum):
@@ -41,74 +73,31 @@ class Case(StrEnum):
     genitive = auto()
     vocative = auto()
 
-    @classmethod
-    def parse_agldt(cls, case: str | None) -> Self | None:
-        if case is None:
-            return None
-        return _case_agldt.get(case)  # type: ignore
+    @staticmethod
+    def parse_agldt(case: str | None) -> Optional["Case"]:
+        pairings = {
+            "n": Case.nominative,
+            "a": Case.accusative,
+            "d": Case.dative,
+            "g": Case.genitive,
+            "v": Case.vocative,
+            "-": None,
+        }
+        return pairings.get(case) if case else None
 
-    @classmethod
-    def parse_conll(cls, case: str) -> Self | None:
-        return _case_conll.get(case)  # type: ignore
-    
-
-_pos_agldt = {
-    "n": POS.noun,
-    "v": POS.verb,
-    "t": POS.participle,
-    "a": POS.adjective,
-    "d": POS.adverb,
-    "l": POS.article,
-    "g": POS.particle,
-    "c": POS.conjunction,
-    "r": POS.preposition,
-    "p": POS.pronoun,
-    "m": POS.numeral,
-    "i": POS.interjection,
-    "e": POS.exclamation,
-    "u": POS.punctuation,
-    "-": None,
-}
-
-_pos_conll = {
-    "ADJ": POS.adjective,
-    "ADP": POS.preposition,
-    "ADV": POS.adverb,
-    "AUX": POS.verb,
-    "CCONJ": POS.conjunction,
-    "DET": POS.article,
-    "INTJ": POS.interjection,
-    "NOUN": POS.noun,
-    "NUM": POS.numeral,
-    "PART": POS.particle,
-    "PRON": POS.pronoun,
-    "PROPN": POS.noun,
-    "PUNCT": POS.punctuation,
-    "SCONJ": POS.conjunction,
-    "SYM": None,
-    "VERB": POS.verb,
-    "X": None,
-}
-
-_case_agldt = {
-    "n": Case.nominative,
-    "a": Case.accusative,
-    "d": Case.dative,
-    "g": Case.genitive,
-    "v": Case.vocative,
-    "-": None,
-}
-
-_case_conll = {
-    "Nom": Case.nominative,
-    "Acc": Case.accusative,
-    "Dat": Case.dative,
-    "Gen": Case.genitive,
-    "Voc": Case.vocative,
-}
+    @staticmethod
+    def parse_conll(case: str) -> Optional["Case"]:
+        pairings = {
+            "Nom": Case.nominative,
+            "Acc": Case.accusative,
+            "Dat": Case.dative,
+            "Gen": Case.genitive,
+            "Voc": Case.vocative,
+        }
+        return pairings.get(case)
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class Word:
     form: str
     id: int | None
@@ -119,7 +108,6 @@ class Word:
     flags: str | None = None
     definition: str | None = None
     ref: Ref | None = None
-    left_pad: str = ""
 
     def __str__(self) -> str:
-        return f"{self.left_pad}{self.form}"
+        return self.form

@@ -1,9 +1,9 @@
 from typing import Callable
 
-from .. import nt, perseus
-from ..constants import AG
-from ..ref import BCV, CV, Line
-from ..treebank import Treebank
+from core import nt, perseus
+from core.constants import AG
+from core.ref import BCV, CV, Line
+from core.treebank import Treebank
 
 corpus: dict[str, Callable[[], Treebank]] = {
     "iliad": lambda: perseus.TB(
