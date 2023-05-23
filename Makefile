@@ -1,12 +1,18 @@
-.PHONY: app
 py = poetry run python
-lexicons = data/lsj.db
+lexicons = data/ag/lsj.db
+
+.PHONY: default app clean
+
+default: $(lexicons)
+	$(py) -m cli.main $(args)
+
 
 app: $(lexicons)
 	$(py) -m app.main
 
-.DEFAULT: $(lexicons)
-	$(py) -m cli.main
+clean:
+	rm -f $(lexicons)
 
 $(lexicons):
 	$(py) -m core.seed
+

@@ -7,9 +7,9 @@ app = typer.Typer()
 
 
 @app.command()
-def gnt() -> None:
-    nt = corpus['nt']()
-    passage = nt['JOHN_1']
+def preview(treebank: str, ref: str) -> None:
+    tb = corpus[treebank]()
+    passage = tb[ref]
     TerminalRenderer(passage).render()
 
 
