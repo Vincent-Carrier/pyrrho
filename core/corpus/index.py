@@ -1,3 +1,4 @@
+from dataclasses import replace
 from typing import NamedTuple
 
 from core.treebank import Metadata
@@ -21,7 +22,7 @@ def index(lang: str | None = None) -> dict[str, Metadata]:
         return {slug: meta for slug, (meta, _) in langs[lang].corpus.items()}
     else:
         return {
-            slug: meta
-            for _, lang in langs.items()
+            slug: replace(meta, lang=lang_slug)
+            for lang_slug, lang in langs.items()
             for slug, (meta, _) in lang.corpus.items()
         }

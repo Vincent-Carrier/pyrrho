@@ -12,8 +12,9 @@ Format = Literal["prose", "verse"]
 
 @dataclass(slots=True)
 class Metadata:
-    title: str = "<untitled>"
-    author: str = "<unknown>"
+    title: str | None = None
+    author: str | None = None
+    lang: str | None = None
     urn: str | bytes | None = None
     eng_urn: str | bytes | None = None
     format: Format = "prose"

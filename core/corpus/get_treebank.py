@@ -2,7 +2,7 @@ from functools import cache
 
 from core.treebank import Metadata, Treebank
 
-from .langs import langs
+from .index import langs
 
 
 @cache
