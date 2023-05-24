@@ -4,6 +4,7 @@ lexicons = data/ag/lsj.db
 .PHONY: default app test format clean
 
 default: $(lexicons)
+	poetry install
 
 app: $(lexicons)
 	$(py) app.main
