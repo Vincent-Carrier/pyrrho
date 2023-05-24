@@ -92,7 +92,7 @@ class RefTree:
         b, c, _ = ref
         assert ref.is_chapter
         return self.tree[b][c]
-    
+
     def __contains__(self, ref: BCV) -> bool:
         b, c, v = ref
         return b in self.tree and c in self.tree[b] and v in self.tree[b][c]

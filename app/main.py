@@ -18,7 +18,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
 async def root():
-    return RedirectResponse('/docs')
+    return RedirectResponse("/docs")
 
 
 @app.get("/langs")

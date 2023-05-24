@@ -11,7 +11,8 @@ from core.word import POS, Case, Word
 
 console = Console()
 
-class TerminalRenderer():
+
+class TerminalRenderer:
     tb: Treebank
 
     def __init__(self, tb: Treebank) -> None:

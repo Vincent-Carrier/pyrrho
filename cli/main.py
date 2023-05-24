@@ -11,6 +11,7 @@ app = typer.Typer()
 
 LangOpt: TypeAlias = Annotated[Optional[str], typer.Option()]
 
+
 @app.command()
 def ls(lang: LangOpt = None) -> None:
     """List all treebanks."""

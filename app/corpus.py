@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import HTMLResponse
 
@@ -22,7 +21,7 @@ async def get_treebank(lang: str, slug: str, ref: str | None = None):
         tb = corpus.get_treebank(lang, slug)
     except KeyError:
         raise HTTPException(status_code=404, detail=f"Unknown treebank {slug}")
-    try: 
+    try:
         if ref is not None:
             tb = tb[ref]
         return HtmlRenderer(tb).render()

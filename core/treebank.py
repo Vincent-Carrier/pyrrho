@@ -9,7 +9,6 @@ from core.word import Word
 Format = Literal["prose", "verse"]
 
 
-
 @dataclass(slots=True)
 class Metadata:
     title: str | None = None
@@ -67,4 +66,3 @@ class Treebank(Generic[T], metaclass=ABCMeta):
 
     def parse_ref(self, ref: str) -> Ref[T]:
         return Ref.parse(self.ref_cls, ref)
-

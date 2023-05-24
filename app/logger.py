@@ -15,7 +15,7 @@ class LoggerConfig:
     format: str
     date_format: str
     logger_file: str
-    level: str = logging.INFO # type: ignore
+    level: str = logging.INFO  # type: ignore
 
 
 @lru_cache
@@ -25,9 +25,9 @@ def get_logger_config():
 
     return LoggerConfig(
         handlers=[RichHandler(rich_tracebacks=True)],
-        format=None, # type: ignore
-        date_format=None, # type: ignore
-        logger_file=None, # type: ignore
+        format=None,  # type: ignore
+        date_format=None,  # type: ignore
+        logger_file=None,  # type: ignore
     )
 
     output_file_handler = logging.FileHandler(LOGGER_FILE)

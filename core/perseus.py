@@ -93,7 +93,7 @@ class PerseusTB(Treebank[T]):
             for el in sentence.findall("./word"):
                 word = self.word(el.attrib)
                 # TODO: yield paragraph tokens
-                if word: 
+                if word:
                     if word.ref and word.ref > prev_ref:
                         if self.meta.format == "prose":
                             yield FT.LINE_BREAK
