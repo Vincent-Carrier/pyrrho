@@ -1,2 +1,2 @@
 from .nt import BCV
-from .nt import GntTreebank as TB
+from .nt import GntTB as TB

@@ -1,18 +1,13 @@
 from pytest import mark
 
 from core import nt
-from core.constants import AG
-from core.corpus.ag import corpus
+from core.corpus import get_treebank
 from core.ref import Ref
 
-tb = nt.TB(
-    AG / "new-testament.conllu",
-    title="New Testament",
-)
 
 @mark.slow
 def test_str():
-    nt = corpus["nt"]()
+    nt = get_treebank("ag", "nt")
     html = str(nt["MATT_1.1"])
     assert "Βίβλος" in html
 

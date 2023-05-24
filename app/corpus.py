@@ -1,39 +1,30 @@
-from functools import cache
 
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import HTMLResponse
 
 from core import corpus
-from core.render import StandaloneRenderer
-from core.treebank import Treebank
+from core.render.html import HtmlRenderer
 
 router = APIRouter()
 
 
-# @router.get("/{lang}")
-# async def get_index(lang: str):
-#     match lang:
-#         case "ag":
-#             return {
-#                 "treebanks": [
-#                     {"slug": slug, "title": entry.meta.title, "author": entry.meta.author}
-#                     for slug, entry in corpus.items()
-#                 ]
-#             }
-#         case _:
-#             return HTTPException(status_code=404, detail=f"Unknown language {lang}")
+@router.get("/{lang}")
+async def get_index(lang: str):
+    try:
+        return corpus.index(lang)
+    except KeyError:
+        raise HTTPException(status_code=404, detail=f"Unknown language {lang}")
 
 
 @router.get("/{lang}/{slug}", response_class=HTMLResponse)
 async def get_treebank(lang: str, slug: str, ref: str | None = None):
-    if (tb := _get_treebank(slug)) is not None:
+    try:
+        tb = corpus.get_treebank(lang, slug)
+    except KeyError:
+        raise HTTPException(status_code=404, detail=f"Unknown treebank {slug}")
+    try: 
         if ref is not None:
             tb = tb[ref]
-        return StandaloneRenderer(tb).render()
-    else:
-        raise HTTPException(status_code=404, detail=f"Unknown treebank {slug}")
-
-
-@cache
-def _get_treebank(slug) -> Treebank | None:
-    return tb() if (tb := corpus.ag.get(slug)) is not None else None
+        return HtmlRenderer(tb).render()
+    except KeyError:
+        raise HTTPException(status_code=404, detail=f"Unknown reference {ref}")

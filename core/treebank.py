@@ -29,9 +29,9 @@ class Treebank(Generic[T], metaclass=ABCMeta):
         self,
         ref_cls: Type[T],
         chunks: Callable[[Self], Iterator[Self]] | None = None,
-        **kwargs,
+        metadata: Metadata = Metadata(),
     ) -> None:
-        self.meta = Metadata(**kwargs)
+        self.meta = metadata
         self.ref_cls = ref_cls
         self.chunks = chunks or (lambda self: iter([self]))
 

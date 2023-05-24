@@ -6,14 +6,14 @@ import dominate.tags as h
 from dominate import document
 
 from core.ref import Ref
-from core.token import FT as FT
+from core.token import FT
 from core.token import Token
 from core.treebank import Treebank
 from core.utils import cx
 from core.word import POS, Word
 
 
-class HtmlRenderer(metaclass=ABCMeta):
+class BaseRenderer(metaclass=ABCMeta):
     tb: Treebank
 
     def __init__(self, tb: Treebank) -> None:
@@ -79,7 +79,7 @@ def _(ref: Ref) -> h.html_tag:
 
 
 @final
-class StandaloneRenderer(HtmlRenderer):
+class HtmlRenderer(BaseRenderer):
     def render(self) -> str:
         return self.document(self.tb).render()
 

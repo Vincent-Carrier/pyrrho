@@ -14,7 +14,7 @@ from core.word import POS, Case, Word
 lsj = LSJ()
 
 
-class TB(Generic[T], Treebank[T]):
+class ConllTB(Generic[T], Treebank[T]):
     conll: Conll
 
     def __init__(

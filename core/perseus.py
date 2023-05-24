@@ -15,7 +15,7 @@ from core.word import POS, Case, Word
 
 
 @final
-class TB(Treebank[T]):
+class PerseusTB(Treebank[T]):
     body: etree._Element
     gorman: bool
     refs: list[Ref] = []

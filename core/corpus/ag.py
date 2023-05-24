@@ -1,46 +1,66 @@
-from typing import Callable
-
-from core import nt, perseus
 from core.constants import AG
+from core.nt.nt import GntTB
+from core.perseus import PerseusTB
 from core.ref import BCV, CV, Line
-from core.treebank import Treebank
+from core.treebank import Metadata
 
-corpus: dict[str, Callable[[], Treebank]] = {
-    "iliad": lambda: perseus.TB(
-        AG / "perseus/2.1/iliad.xml",
-        ref_cls=CV,
-        title="Iliad",
-        author="Homer",
-        format="verse",
+from .corpus_entry import CorpusEntry
+
+corpus = {
+    "iliad": CorpusEntry(
+        Metadata(
+            title="Iliad",
+            author="Homer",
+            format="verse",
+        ),
+        lambda metadata: PerseusTB(
+            AG / "perseus/2.1/iliad.xml", ref_cls=CV, metadata=metadata
+        ),
     ),
-    "persians": lambda: perseus.TB(
-        AG / "perseus/2.1/persians.xml",
-        ref_cls=Line,
-        title="Persians",
-        author="Aeschylus",
-        format="verse",
+    "persians": CorpusEntry(
+        Metadata(
+            title="Persians",
+            author="Aeschylus",
+            format="verse",
+        ),
+        lambda metadata: PerseusTB(
+            AG / "perseus/2.1/persians.xml", ref_cls=Line, metadata=metadata
+        ),
     ),
-    "histories": lambda: perseus.TB(
-        AG / "perseus/2.1/thucydides.xml",
-        ref_cls=BCV,
-        title="Histories, Book 1",
-        author="Thucydides",
+    "histories": CorpusEntry(
+        Metadata(
+            title="Histories, Book 1",
+            author="Thucydides",
+        ),
+        lambda metadata: PerseusTB(
+            AG / "perseus/2.1/thucydides.xml", ref_cls=BCV, metadata=metadata
+        ),
     ),
-    "historiae": lambda: perseus.TB(
-        AG / "perseus/2.1/herodotus.xml",
-        ref_cls=BCV,
-        title="Historiae, Book 1",
-        author="Herodotus",
+    "historiae": CorpusEntry(
+        Metadata(
+            title="Historiae, Book 1",
+            author="Herodotus",
+        ),
+        lambda metadata: PerseusTB(
+            AG / "perseus/2.1/herodotus.xml", ref_cls=BCV, metadata=metadata
+        ),
     ),
-    "anabasis": lambda: perseus.TB(
-        AG / "vgorman/Xen_Anab_book_1.1-5.xml",
-        ref_cls=BCV,
-        title="Anabasis, Book 1",
-        author="Xenophon",
-        gorman=True,
+    "anabasis": CorpusEntry(
+        Metadata(
+            title="Anabasis, Book 1",
+            author="Xenophon",
+        ),
+        lambda metadata: PerseusTB(
+            AG / "vgorman/Xen_Anab_book_1.1-5.xml",
+            ref_cls=BCV,
+            gorman=True,
+            metadata=metadata,
+        ),
     ),
-    "nt": lambda: nt.TB(
-        AG / "new-testament.conllu",
-        title="New Testament",
+    "nt": CorpusEntry(
+        Metadata(
+            title="New Testament",
+        ),
+        lambda metadata: GntTB(AG / "new-testament.conllu", metadata=metadata),
     ),
 }

@@ -5,7 +5,7 @@ from typing import Iterator, Self, cast, final
 
 from pyconll.unit.token import Token as ConllToken
 
-from core import conll
+from core.conll import ConllTB
 from core.nt.ref import BCV, RefTree
 from core.ref import Ref, RefRange
 from core.token import FT
@@ -14,7 +14,7 @@ from core.word import Word
 
 
 @final
-class GntTreebank(conll.TB[BCV]):
+class GntTB(ConllTB[BCV]):
     refs: dict[BCV, int]
     ref_tree: RefTree
 
