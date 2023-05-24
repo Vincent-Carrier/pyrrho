@@ -2,7 +2,8 @@
 
 body {
 	max-width: 65ch;
-	margin: 2em;
+	margin: 0 auto;
+	padding: 2em;
 	line-height: 1.7;
 	font-size: 1.4em;
 	color: #333;
