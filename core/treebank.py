@@ -1,6 +1,15 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
-from typing import Callable, Generic, Iterator, Literal, Self, Type
+from typing import (
+    Generic,
+    Iterator,
+    Literal,
+    NamedTuple,
+    Optional,
+    Protocol,
+    Self,
+    Type,
+)
 
 from core.ref import Ref, T
 from core.token import FT, Token
@@ -23,17 +32,20 @@ class Treebank(Generic[T], metaclass=ABCMeta):
     meta: Metadata
     ref_cls: Type[T]
     ref: Ref | None = None
-    chunks: Callable[[Self], Iterator[Self]]
+    chunker: "Chunker"
 
     def __init__(
         self,
         ref_cls: Type[T],
-        chunks: Callable[[Self], Iterator[Self]] | None = None,
+        chunker: Optional["Chunker"] = None,
         metadata: Metadata = Metadata(),
     ) -> None:
         self.meta = metadata
         self.ref_cls = ref_cls
-        self.chunks = chunks or (lambda self: iter([self]))
+        self.chunker = chunker or WholeChunker(self)
+
+    def chunks(self) -> Iterator["Treebank"]:
+        return self.chunker()
 
     @abstractmethod
     def __getitem__(self, ref: Ref | str) -> Self:
@@ -66,3 +78,15 @@ class Treebank(Generic[T], metaclass=ABCMeta):
 
     def parse_ref(self, ref: str) -> Ref[T]:
         return Ref.parse(self.ref_cls, ref)
+
+
+class Chunker(Protocol):
+    def __call__(self) -> Iterator[Treebank]:
+        ...
+
+
+class WholeChunker(NamedTuple):
+    tb: Treebank
+
+    def __call__(self) -> Iterator[Treebank]:
+        return iter([self.tb])

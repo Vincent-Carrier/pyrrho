@@ -19,7 +19,7 @@ Run `make app`, then go to `/docs` or try `/corpus/ag/nt?ref=JOHN_1`.
 
 ```
 ./pyrrho ls
-./pyrrho preview ag nt JOHN_1
+./pyrrho cat ag nt JOHN_1
 ```
 
 [![asciicast](https://asciinema.org/a/G6V0jSt3hPaiBPeJ0A0YJQJhR.svg)](https://asciinema.org/a/G6V0jSt3hPaiBPeJ0A0YJQJhR)

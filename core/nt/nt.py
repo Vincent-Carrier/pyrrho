@@ -1,7 +1,7 @@
 from copy import copy
 from dataclasses import replace
 from pathlib import Path
-from typing import Iterator, Self, cast, final
+from typing import Iterator, NamedTuple, Self, cast, final
 
 from pyconll.unit.token import Token as ConllToken
 
@@ -22,6 +22,7 @@ class GntTB(ConllTB[BCV]):
         super().__init__(f, ref_cls=BCV, **kwargs)
         self.refs = {self.get_bcv(w): i for i, s in enumerate(self.conll) for w in s}
         self.ref_tree = RefTree(self.refs.keys())
+        self.chunker = ChapterChunker(self)
 
     def __getitem__(self, ref: Ref[BCV] | str) -> Self:
         i, j = 0, 0
@@ -70,3 +71,11 @@ class GntTB(ConllTB[BCV]):
     def get_bcv(self, token: ConllToken) -> BCV:
         [r] = iter(token.misc["Ref"])  # type: ignore
         return BCV.parse(r)
+
+
+class ChapterChunker(NamedTuple):
+    tb: GntTB
+
+    def __call__(self) -> Iterator[GntTB]:
+        for chapter in self.tb.ref_tree.chapters():
+            yield self.tb[chapter]

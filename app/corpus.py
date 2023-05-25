@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import HTMLResponse
 
 from core import corpus
-from core.render.html import HtmlRenderer
+from core.render import StandaloneHtmlRenderer
 
 router = APIRouter()
 
@@ -24,6 +24,6 @@ async def get_treebank(lang: str, slug: str, ref: str | None = None):
     try:
         if ref is not None:
             tb = tb[ref]
-        return HtmlRenderer(tb).render()
+        return StandaloneHtmlRenderer(tb).render()
     except KeyError:
         raise HTTPException(status_code=404, detail=f"Unknown reference {ref}")

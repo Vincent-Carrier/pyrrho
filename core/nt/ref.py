@@ -1,11 +1,11 @@
 from dataclasses import dataclass, replace
 from itertools import groupby
-from typing import Iterable, Self, final
+from typing import Iterable, Iterator, Self, final
 
 import dominate.tags as h
 from ordered_enum import OrderedEnum  # type: ignore
 
-from core.ref import RefPoint
+from core.ref import Ref, RefPoint
 
 
 class Book(OrderedEnum):
@@ -96,6 +96,13 @@ class RefTree:
     def __contains__(self, ref: BCV) -> bool:
         b, c, v = ref
         return b in self.tree and c in self.tree[b] and v in self.tree[b][c]
+
+    def chapters(self) -> Iterator[Ref[BCV]]:
+        for book, chapters in self.tree.items():
+            if book > Book.JOHN:  # TODO: fix JOHN3
+                return
+            for chapter in chapters:
+                yield Ref(BCV(book, chapter))
 
     def next(self, ref: BCV) -> BCV | None:
         b, c, v = ref

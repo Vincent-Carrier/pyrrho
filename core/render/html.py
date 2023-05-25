@@ -1,4 +1,3 @@
-from abc import ABCMeta
 from functools import singledispatch
 from typing import Iterable, assert_never, final
 
@@ -6,14 +5,15 @@ import dominate.tags as h
 from dominate import document
 
 from core.ref import Ref
-from core.token import FT
-from core.token import Token
+from core.token import FT, Token
 from core.treebank import Treebank
 from core.utils import cx
 from core.word import POS, Word
 
 
-class BaseRenderer(metaclass=ABCMeta):
+class HtmlRenderer:
+    """Renders a treebank as an HTML partial"""
+
     tb: Treebank
 
     def __init__(self, tb: Treebank) -> None:
@@ -52,6 +52,9 @@ class BaseRenderer(metaclass=ABCMeta):
             container += paragraph
         return container
 
+    def render(self) -> str:
+        return self.body(iter(self.tb)).render()
+
 
 @singledispatch
 def render(obj) -> h.html_tag:
@@ -79,7 +82,9 @@ def _(ref: Ref) -> h.html_tag:
 
 
 @final
-class HtmlRenderer(BaseRenderer):
+class HtmlDocumentRenderer(HtmlRenderer):
+    """Renders a treebank as a standalone HTML document"""
+
     def render(self) -> str:
         return self.document(self.tb).render()
 
