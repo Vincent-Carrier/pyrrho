@@ -1,4 +1,4 @@
-py = poetry run python -m
+py = poetry run python
 lexicons = data/ag/lsj.db
 
 .PHONY: default app test format clean
@@ -7,7 +7,7 @@ default: $(lexicons)
 	poetry install
 
 app: $(lexicons)
-	$(py) app.main
+	$(py) -m app.main
 
 html: $(lexicons)
 	./pyrrho build ag nt
@@ -25,5 +25,5 @@ clean:
 	rm -rf build
 
 $(lexicons):
-	$(py) seed
+	$(py) scripts/seed.py
 
