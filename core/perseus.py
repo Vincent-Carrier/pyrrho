@@ -95,7 +95,7 @@ class PerseusTB(Treebank[T]):
                 # TODO: yield paragraph tokens
                 if word:
                     if word.ref and word.ref > prev_ref:
-                        if self.meta.format == "prose":
+                        if self.meta.writing_style == "prose":
                             yield FT.LINE_BREAK
                         prev_ref = word.ref
                     if prev_form and (prev_form not in PUNCTUATION):

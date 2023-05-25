@@ -9,14 +9,20 @@ default: $(lexicons)
 app: $(lexicons)
 	$(py) app.main
 
+html: $(lexicons)
+	./pyrrho build ag nt
+
 test:
 	poetry run pytest
 
 format:
 	poetry run black .
 
-clean:
+db_clean:
 	rm -f $(lexicons)
+
+clean:
+	rm -rf build
 
 $(lexicons):
 	$(py) seed

@@ -1,3 +1,5 @@
+import json
+from dataclasses import asdict
 from typing import Optional, TypeAlias
 
 import typer
@@ -8,6 +10,7 @@ from typing_extensions import Annotated
 from core import corpus
 from core.constants import BUILD
 from core.render import HtmlRenderer, TerminalRenderer
+from core.utils import filter_none
 
 app = typer.Typer()
 console = Console()
@@ -40,10 +43,13 @@ def cat(lang: str, slug: str, ref: str) -> None:
 @app.command()
 def build(lang: str, slug: str) -> None:
     tb = corpus.get_treebank(lang, slug)
+    dir = BUILD / lang / slug
+    m = dir / "metadata.json"
+    obj = filter_none(asdict(tb.meta))
+    m.write_text(json.dumps(obj, indent=2))
     for chunk in tb.chunks():
-        dir = BUILD / lang / slug
         dir.mkdir(parents=True, exist_ok=True)
-        f = dir / f"{chunk.ref}.html"
+        f = dir / f"{chunk.meta.ref}.html"
         f.write_text(HtmlRenderer(chunk).render())
 
 

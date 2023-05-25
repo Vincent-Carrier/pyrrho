@@ -15,17 +15,18 @@ from core.ref import Ref, T
 from core.token import FT, Token
 from core.word import Word
 
-Format = Literal["prose", "verse"]
+WritingStyle = Literal["prose", "verse"]
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class Metadata:
     title: str | None = None
     author: str | None = None
+    ref: str | None = None
     lang: str | None = None
     urn: str | bytes | None = None
     eng_urn: str | bytes | None = None
-    format: Format = "prose"
+    writing_style: WritingStyle = "prose"
 
 
 class Treebank(Generic[T], metaclass=ABCMeta):

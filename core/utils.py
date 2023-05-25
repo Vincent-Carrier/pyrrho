@@ -10,6 +10,9 @@ def at(l: list[T] | None, i: int) -> T | None:
         return None
     return l[i] if len(l) > i else None
 
+def filter_none(d: dict) -> dict:
+    return {k: v for k, v in d.items() if v is not None}
+
 
 def parse_int(s: str | None) -> int | None:
     return int(s) if s else None

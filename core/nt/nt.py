@@ -48,6 +48,7 @@ class GntTB(ConllTB[BCV]):
         tb = copy(self)
         tb.conll = self.conll[i:j]
         tb.ref = Ref(r)
+        tb.meta = replace(self.meta, ref=str(ref))
         return tb
 
     def __iter__(self) -> Iterator[Token]:

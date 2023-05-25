@@ -11,7 +11,7 @@ corpus = {
         Metadata(
             title="Iliad",
             author="Homer",
-            format="verse",
+            writing_style="verse",
         ),
         lambda metadata: PerseusTB(
             AG / "perseus/2.1/iliad.xml", ref_cls=CV, metadata=metadata
@@ -21,7 +21,7 @@ corpus = {
         Metadata(
             title="Persians",
             author="Aeschylus",
-            format="verse",
+            writing_style="verse",
         ),
         lambda metadata: PerseusTB(
             AG / "perseus/2.1/persians.xml", ref_cls=Line, metadata=metadata
