@@ -1,8 +1,8 @@
 from pytest import mark
 
-from core import nt
 from core.corpus import get_treebank
 from core.ref import Ref
+from core.treebank.nt import NT_BCV
 
 
 @mark.slow
@@ -12,7 +12,7 @@ def test_str():
     assert "Βίβλος" in html
 
 
-ref = lambda s: Ref(nt.BCV.parse(s))
+ref = lambda s: Ref(NT_BCV.parse(s))
 
 
 @mark.parametrize(

@@ -8,8 +8,8 @@ from pyCTS import CTS_URN
 
 from core.constants import LSJ, PUNCTUATION
 from core.ref import Ref, T
-from core.token import FT
-from core.treebank import Token, Treebank
+from core.token import FT, Token
+from core.treebank import Treebank
 from core.utils import at, eprint, parse_int
 from core.word import POS, Case, Word
 
@@ -37,12 +37,6 @@ class PerseusTB(Treebank[T]):
                 self.body = root
             else:
                 self.body = cast(etree._Element, root.find(".//body"))
-
-            self.meta.urn = root.attrib.get("cts")
-            if self.meta.urn is None:
-                self.meta.urn = self.body.find("./sentence").get("document_id")  # type: ignore
-            if self.meta.urn:
-                self.meta.urn = self.normalize_urn(self.meta.urn)
 
             self.refs = [
                 self.parse_ref(r)

@@ -7,8 +7,8 @@ from pyconll.unit.token import Token as ConllToken
 
 from core.constants import LSJ
 from core.ref import Ref, T
-from core.token import FT
-from core.treebank import Token, Treebank
+from core.token import FT, Token
+from core.treebank import Treebank
 from core.word import POS, Case, Word
 
 lsj = LSJ()

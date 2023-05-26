@@ -1,8 +1,6 @@
 from core.constants import AG
-from core.nt.nt import GntTB
-from core.perseus import PerseusTB
 from core.ref import BCV, CV, Line
-from core.treebank import Metadata
+from core.treebank import GntTB, Metadata, PerseusTB
 
 from .corpus_entry import CorpusEntry
 

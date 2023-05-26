@@ -5,12 +5,12 @@ from typing import Iterator, NamedTuple, Self, cast, final
 
 from pyconll.unit.token import Token as ConllToken
 
-from core.conll import ConllTB
-from core.nt.ref import BCV, RefTree
 from core.ref import Ref, RefRange
-from core.token import FT
-from core.treebank import Token
+from core.token import FT, Token
 from core.word import Word
+
+from ..conll import ConllTB
+from .ref import BCV, RefTree
 
 
 @final
