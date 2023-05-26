@@ -1,15 +1,23 @@
-py = poetry run python
-lexicons = data/ag/lsj.db
+py := poetry run python
+lexicons := data/ag/lsj.db
+html := $(wildcard build/**.html)
 
-.PHONY: default app test format clean
+.PHONY: default app html export test format clean
 
 default: $(lexicons)
 	poetry install
+	npm install
 
 app: $(lexicons)
 	$(py) -m app.main
 
-html: $(lexicons)
+export: $(html)
+	node scripts/sanity_export.js
+
+html: $(html)
+
+.DELETE_ON_ERROR:
+$(html): $(lexicons)
 	./pyrrho build ag nt
 
 test:
