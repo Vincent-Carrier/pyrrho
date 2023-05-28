@@ -24,6 +24,7 @@ pyconll = "^3.1.0"
 ordered-enum = "^0.0.8"
 pycts = "^0.2.2"
 rich = "^13.3.5"
+jinja2 = "^3.1.2"
 
 [tool.poetry.group.dev.dependencies]
 lxml-stubs = "^0.4.0"

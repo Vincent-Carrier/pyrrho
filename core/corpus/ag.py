@@ -2,63 +2,69 @@ from core.constants import AG
 from core.ref import BCV, CV, Line
 from core.treebank import GntTB, Metadata, PerseusTB
 
-from .corpus_entry import CorpusEntry
+from .corpus_entry import CorpusEntry, DocId
 
 corpus = {
-    "iliad": CorpusEntry(
+    DocId("iliad"): CorpusEntry(
         Metadata(
+            lang="ag",
             title="Iliad",
             author="Homer",
             writing_style="verse",
         ),
-        lambda metadata: PerseusTB(
-            AG / "perseus/2.1/iliad.xml", ref_cls=CV, metadata=metadata
+        lambda meta: PerseusTB(
+            AG / "perseus/2.1/iliad.xml", ref_cls=CV, meta=meta
         ),
     ),
-    "persians": CorpusEntry(
+    DocId("persians"): CorpusEntry(
         Metadata(
+            lang="ag",
             title="Persians",
             author="Aeschylus",
             writing_style="verse",
         ),
-        lambda metadata: PerseusTB(
-            AG / "perseus/2.1/persians.xml", ref_cls=Line, metadata=metadata
+        lambda meta: PerseusTB(
+            AG / "perseus/2.1/persians.xml", ref_cls=Line, meta=meta
         ),
     ),
-    "histories": CorpusEntry(
+    DocId("histories"): CorpusEntry(
         Metadata(
+            lang="ag",
             title="Histories, Book 1",
             author="Thucydides",
         ),
-        lambda metadata: PerseusTB(
-            AG / "perseus/2.1/thucydides.xml", ref_cls=BCV, metadata=metadata
+        lambda meta: PerseusTB(
+            AG / "perseus/2.1/thucydides.xml", ref_cls=BCV, meta=meta
         ),
     ),
-    "historiae": CorpusEntry(
+    DocId("historiae"): CorpusEntry(
         Metadata(
+            lang="ag",
             title="Historiae, Book 1",
             author="Herodotus",
         ),
-        lambda metadata: PerseusTB(
-            AG / "perseus/2.1/herodotus.xml", ref_cls=BCV, metadata=metadata
+        lambda meta: PerseusTB(
+            AG / "perseus/2.1/herodotus.xml", ref_cls=BCV, meta=meta
         ),
     ),
-    "anabasis": CorpusEntry(
+    DocId("anabasis"): CorpusEntry(
         Metadata(
+            lang="ag",
             title="Anabasis, Book 1",
             author="Xenophon",
         ),
-        lambda metadata: PerseusTB(
+        lambda meta: PerseusTB(
             AG / "vgorman/Xen_Anab_book_1.1-5.xml",
             ref_cls=BCV,
             gorman=True,
-            metadata=metadata,
+            meta=meta,
         ),
     ),
-    "nt": CorpusEntry(
+    DocId("nt"): CorpusEntry(
         Metadata(
+            lang="ag",
             title="New Testament",
         ),
-        lambda metadata: GntTB(AG / "new-testament.conllu", metadata=metadata),
+        lambda meta: GntTB(AG / "new-testament.conllu", meta=meta),
     ),
 }

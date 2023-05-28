@@ -1,6 +1,8 @@
-from typing import Callable, NamedTuple
+from typing import Callable, NamedTuple, NewType
 
 from core.treebank import Metadata, Treebank
+
+DocId = NewType("DocId", str)
 
 
 class CorpusEntry(NamedTuple):

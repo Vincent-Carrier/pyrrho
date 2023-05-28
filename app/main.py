@@ -1,5 +1,4 @@
 import logging
-from os import environ as env
 
 import uvicorn
 from fastapi import FastAPI

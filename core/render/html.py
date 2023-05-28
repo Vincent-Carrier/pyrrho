@@ -1,59 +1,15 @@
 from functools import singledispatch
-from typing import Iterable, assert_never, final
+from typing import Iterable, NamedTuple, assert_never, final
 
 import dominate.tags as h
-from dominate import document
 
+from core.constants import BUILD, jinja
 from core.ref import Ref
 from core.token import FT, Token
 from core.treebank import Treebank
+from core.treebank.treebank import Metadata
 from core.utils import cx
 from core.word import POS, Word
-
-
-class HtmlRenderer:
-    """Renders a treebank as an HTML partial"""
-
-    tb: Treebank
-
-    def __init__(self, tb: Treebank) -> None:
-        self.tb = tb
-
-    def body(self, tokens: Iterable[Token]) -> h.html_tag:
-        sentence = h.span(cls="sentence")
-        paragraph = h.p()
-        container = h.div(cls="treebank syntax")
-
-        for t in tokens:
-            match t:
-                case Word() as word:
-                    sentence += render(word)
-                case Ref() as ref:
-                    sentence += render(ref)
-                case FT.SPACE:
-                    sentence += " "
-                case FT.SENTENCE_START:
-                    sentence = h.span(cls="sentence")
-                case FT.SENTENCE_END:
-                    if len(sentence):
-                        paragraph += sentence
-                case FT.PARAGRAPH_START:
-                    paragraph = h.p()
-                case FT.PARAGRAPH_END:
-                    if len(paragraph):
-                        container += paragraph
-                case FT.LINE_BREAK:
-                    sentence += h.br()
-                case None:
-                    pass
-                case _:
-                    assert_never(t)
-        if len(paragraph):
-            container += paragraph
-        return container
-
-    def render(self) -> str:
-        return self.body(iter(self.tb)).render()
 
 
 @singledispatch
@@ -81,27 +37,53 @@ def _(ref: Ref) -> h.html_tag:
     return h.span(str(ref), cls="ref")
 
 
-@final
-class HtmlDocumentRenderer(HtmlRenderer):
-    """Renders a treebank as a standalone HTML document"""
+class HtmlPartialRenderer(NamedTuple):
+    """Renders a treebank as an HTML partial"""
+
+    tb: Treebank
+
+    def body(self) -> h.html_tag:
+        sentence = h.span(cls="sentence")
+        paragraph = h.p()
+        container = h.div(cls="treebank syntax")
+
+        for t in iter(self.tb):
+            match t:
+                case Word() | Ref():
+                    sentence += render(t)
+                case FT.SPACE:
+                    sentence += " "
+                case FT.PARAGRAPH_START:
+                    paragraph = h.p()
+                case FT.SENTENCE_START:
+                    sentence = h.span(cls="sentence")
+                case FT.PARAGRAPH_END:
+                    if len(paragraph):
+                        container += paragraph
+                case FT.SENTENCE_END:
+                    if len(sentence):
+                        paragraph += sentence
+                case FT.LINE_BREAK:
+                    sentence += h.br()
+                case None:
+                    pass
+                case _:
+                    assert_never(t)
+        if len(sentence):
+            paragraph += sentence
+        if len(paragraph):
+            container += paragraph
+        return container
 
     def render(self) -> str:
-        return self.document(self.tb).render()
+        return self.body().render()
 
-    def document(self, tb) -> document:
-        doc = document(title=tb.meta.title)
-        pre = self.body(iter(tb))
-        text = h.div(pre, cls=f"{tb.meta.format}-format")
-        with doc.head:  # type: ignore
-            h.meta(name="author", content=tb.meta.author)
-            h.link(rel="stylesheet", href="/static/styles.css")
-        with doc:
-            doc.add(text)
-            h.script(
-                src="https://cdnjs.cloudflare.com/ajax/libs/cash/8.1.5/cash.min.js"
-            )
-            h.script(src="https://unpkg.com/@popperjs/core@2")
-            h.script(src="https://unpkg.com/tippy.js@6")
-            h.script(src="/static/reader.js", type="module")
 
-        return doc
+class HtmlDocumentRenderer(NamedTuple):
+    """Renders a treebank as a standalone HTML document"""
+    meta: Metadata
+
+    def render(self) -> str:
+        templ = jinja.get_template("treebank.html")
+        text = self.meta.partial_path.read_text()
+        return templ.render(text=text, meta=self.meta)

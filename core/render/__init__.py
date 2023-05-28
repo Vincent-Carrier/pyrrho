@@ -1,6 +1,6 @@
 from typing import Any, Protocol
 
-from .html import HtmlDocumentRenderer, HtmlRenderer
+from .html import HtmlDocumentRenderer, HtmlPartialRenderer
 from .terminal import TerminalRenderer
 
 

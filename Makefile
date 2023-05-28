@@ -1,6 +1,6 @@
 py := poetry run python
 lexicons := data/ag/lsj.db
-html := $(wildcard build/**.html)
+chunks := $(wildcard build/chunks/**.html)
 
 .PHONY: default app html export test format clean
 
@@ -11,10 +11,7 @@ default: $(lexicons)
 app: $(lexicons)
 	$(py) -m app.main
 
-export: $(html)
-	node scripts/sanity_export.js
-
-html: $(html)
+html: $(chunks)
 
 .DELETE_ON_ERROR:
 $(html): $(lexicons)

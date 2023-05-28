@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
+from pathlib import Path
 from typing import (
     Generic,
     Iterator,
@@ -11,6 +12,7 @@ from typing import (
     Type,
 )
 
+from core.constants import BUILD
 from core.ref import Ref, T
 from core.token import FT, Token
 from core.word import Word
@@ -20,13 +22,25 @@ WritingStyle = Literal["prose", "verse"]
 
 @dataclass(slots=True, frozen=True)
 class Metadata:
-    title: str | None = None
+    lang: str
+    title: str
     author: str | None = None
     ref: str | None = None
-    lang: str | None = None
     urn: str | bytes | None = None
     eng_urn: str | bytes | None = None
     writing_style: WritingStyle = "prose"
+
+    @property
+    def authorship(self) -> str:
+        return self.author or "unknown"
+
+    @property
+    def partial_path(self) -> Path:
+        dir = BUILD / "partials" / self.lang / self.authorship
+        if self.ref:
+            return dir / self.title / f"{self.ref}.html"
+        else:
+            return dir / self.title / "index.html"
 
 
 class Treebank(Generic[T], metaclass=ABCMeta):
@@ -37,11 +51,11 @@ class Treebank(Generic[T], metaclass=ABCMeta):
 
     def __init__(
         self,
+        meta: Metadata,
         ref_cls: Type[T],
         chunker: Optional["Chunker"] = None,
-        metadata: Metadata = Metadata(),
     ) -> None:
-        self.meta = metadata
+        self.meta = meta
         self.ref_cls = ref_cls
         self.chunker = chunker or WholeChunker(self)
 

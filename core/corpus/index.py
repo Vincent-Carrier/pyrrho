@@ -1,5 +1,5 @@
 from dataclasses import replace
-from typing import NamedTuple
+from typing import Iterator, NamedTuple, NewType
 
 from core.treebank import Metadata
 
@@ -7,13 +7,15 @@ from .ag import corpus as ag_corpus
 from .corpus_entry import CorpusEntry
 
 
+LangId = NewType("LangId", str)
+
 class LangEntry(NamedTuple):
     name: str
-    corpus: dict[str, CorpusEntry]
+    corpus: dict[DocId, CorpusEntry]
 
 
 langs = {
-    "ag": LangEntry("Ancient Greek", ag_corpus),
+    LangId("ag"): LangEntry("Ancient Greek", ag_corpus),
 }
 
 
@@ -26,3 +28,6 @@ def index(lang: str | None = None) -> dict[str, Metadata]:
             for lang_slug, lang in langs.items()
             for slug, (meta, _) in lang.corpus.items()
         }
+
+
+def all_treebanks() -> Iterator[CorpusEntry]:
