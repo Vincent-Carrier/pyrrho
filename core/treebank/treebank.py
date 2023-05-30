@@ -1,16 +1,10 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import (
-    Generic,
-    Iterator,
-    Literal,
-    NamedTuple,
-    Optional,
-    Protocol,
-    Self,
-    Type,
-)
+from typing import (Generic, Iterator, Literal, NamedTuple, Optional, Protocol,
+                    Self, Type)
+
+from slugify import slugify
 
 from core.constants import BUILD
 from core.ref import Ref, T
@@ -33,14 +27,18 @@ class Metadata:
     @property
     def authorship(self) -> str:
         return self.author or "unknown"
+    
+    @property
+    def slug(self) -> str:
+        return slugify(self.title)
 
     @property
     def partial_path(self) -> Path:
-        dir = BUILD / "partials" / self.lang / self.authorship
+        dir = BUILD / "partials" / self.lang / slugify(self.authorship)
         if self.ref:
-            return dir / self.title / f"{self.ref}.html"
+            return dir / self.slug / f"{self.ref}.html"
         else:
-            return dir / self.title / "index.html"
+            return dir / self.slug / "index.html"
 
 
 class Treebank(Generic[T], metaclass=ABCMeta):

@@ -3,30 +3,30 @@
 
 body
 	max-width: 65ch
-	+text($gray700, lg, serif)
+	+text(gray(), lg, serif)
 	+box($mx: auto, $px: 4, $py: 4)
 
 .verb
 	+text($wght: 700)
 .nominative
-	+text($teal700)
+	+text(teal())
 .accusative
-	+text($sky700)
+	+text(sky())
 .dative
-	+text($pink700)
+	+text(pink())
 .genitive
-	+text($violet700)
+	+text(violet())
 .vocative
-	+text($teal700)
+	+text(teal())
 .highlight
-	+text($yellow400)
+	+text(yellow(400))
 
 .subdoc
 	padding-right: len(2)
 .verse
 	padding-right: len(2)
-	+text($gray500, sm)
+	+text(gray(500), sm)
 .prose-format .sentence:not(:last-child)::after
 	content: '—' 
 	+box($px: 1)
-	+text($gray500)
+	+text(gray(500))

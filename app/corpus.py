@@ -24,6 +24,6 @@ async def get_treebank(lang: str, slug: str, ref: str | None = None):
     try:
         if ref is not None:
             tb = tb[ref]
-        return HtmlDocumentRenderer(tb).render()
+        return HtmlDocumentRenderer(tb.meta).render()
     except KeyError:
         raise HTTPException(status_code=404, detail=f"Unknown reference {ref}")

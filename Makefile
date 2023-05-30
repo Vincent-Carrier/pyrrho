@@ -1,6 +1,6 @@
 py := poetry run python
 lexicons := data/ag/lsj.db
-chunks := $(wildcard build/chunks/**.html)
+partials := $(wildcard build/partials/**.html)
 css := static/styles.css
 sass := $(wildcard styles/**.sass)
 
@@ -13,11 +13,10 @@ default: $(lexicons)
 app: $(lexicons)
 	$(py) -m app.main
 
-html: $(chunks)
+html: $(partials)
 
-.DELETE_ON_ERROR:
-$(html): $(lexicons)
-	./pyrrho build ag nt
+$(partials): $(lexicons) $(wildcard core/render/**)
+	$(py) scripts/partials.py
 
 $(css): $(sass)
 	sass styles/styles.sass $@
