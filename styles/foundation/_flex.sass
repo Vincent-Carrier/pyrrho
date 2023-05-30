@@ -1,0 +1,11 @@
+@use 'theme' as *
+
+@mixin flex-x($gap)
+	display: flex
+	flex-direction: row
+	column-gap: len($gap)
+
+@mixin flex-y($gap)
+	display: flex
+	flex-direction: column
+	row-gap: len($gap)

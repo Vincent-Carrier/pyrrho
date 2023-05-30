@@ -1,0 +1,32 @@
+@use 'foundation' as *
+@import url('https://fonts.googleapis.com/css2?family=Alegreya:wght=400..900&display=swap')
+
+body
+	max-width: 65ch
+	+text($gray700, lg, serif)
+	+box($mx: auto, $px: 4, $py: 4)
+
+.verb
+	+text($wght: 700)
+.nominative
+	+text($teal700)
+.accusative
+	+text($sky700)
+.dative
+	+text($pink700)
+.genitive
+	+text($violet700)
+.vocative
+	+text($teal700)
+.highlight
+	+text($yellow400)
+
+.subdoc
+	padding-right: len(2)
+.verse
+	padding-right: len(2)
+	+text($gray500, sm)
+.prose-format .sentence:not(:last-child)::after
+	content: '—' 
+	+box($px: 1)
+	+text($gray500)

@@ -5,7 +5,7 @@ from core import corpus
 from core.render import HtmlPartialRenderer
 from core.utils import filter_none
 
-for lang, slug in corpus.index().items():
+for lang, slug in corpus.all_treebanks():
     tb = corpus.get_treebank(lang, slug)
     dir = tb.meta.partial_path.parent
     dir.mkdir(parents=True, exist_ok=True)

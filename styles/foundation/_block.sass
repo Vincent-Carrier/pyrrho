@@ -1,0 +1,15 @@
+@use 'theme' as *
+
+@mixin box($w: null, $h: null, $mx: null, $my: null, $px: null, $py: null)
+	width: len($w)
+	height: len($h)
+	margin-inline: len($mx)
+	margin-block: len($my)
+	padding-inline: len($px)
+	padding-block: len($py)
+
+@mixin surface($bg: null, $radius: null, $border: null, $shadow: null)
+	background-color: $bg
+	+radius($radius)
+	+border($border)
+	+shadow($shadow)

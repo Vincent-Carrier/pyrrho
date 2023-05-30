@@ -1,6 +1,8 @@
 py := poetry run python
 lexicons := data/ag/lsj.db
 chunks := $(wildcard build/chunks/**.html)
+css := static/styles.css
+sass := $(wildcard styles/**.sass)
 
 .PHONY: default app html export test format clean
 
@@ -16,6 +18,9 @@ html: $(chunks)
 .DELETE_ON_ERROR:
 $(html): $(lexicons)
 	./pyrrho build ag nt
+
+$(css): $(sass)
+	sass styles/styles.sass $@
 
 test:
 	poetry run pytest

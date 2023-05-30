@@ -1,2 +1,2 @@
-from .get_treebank import get_metadata, get_treebank
-from .index import index
+from .get_treebank import DocId, get_metadata, get_treebank
+from .index import LangId, all_treebanks, index

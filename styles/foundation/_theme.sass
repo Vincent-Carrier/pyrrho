@@ -1,0 +1,17 @@
+@use 'sass:map'
+@use 'config' as *
+
+@function len($size)
+	@return map.get($sizes, $size)
+
+@mixin font-size($size)
+	$fs: map.get($font-sizes, $size)
+	@if $fs
+		font-size: nth($fs, 1)
+		line-height: nth($fs, 2)
+
+@mixin shadow($shadow)
+	box-shadow: #{map.get($shadows, $shadow)}
+
+@mixin radius($radius)
+	border-radius: #{map.get($radii, $radius)}

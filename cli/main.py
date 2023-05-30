@@ -1,5 +1,3 @@
-import json
-from dataclasses import asdict
 from typing import Optional, TypeAlias
 
 import typer
@@ -8,14 +6,13 @@ from rich.table import Table
 from typing_extensions import Annotated
 
 from core import corpus
-from core.constants import BUILD
-from core.render import HtmlPartialRenderer, TerminalRenderer
-from core.utils import filter_none
+from core.corpus import DocId, LangId
+from core.render import TerminalRenderer
 
 app = typer.Typer()
 console = Console()
 
-LangOpt: TypeAlias = Annotated[Optional[str], typer.Option()]
+LangOpt: TypeAlias = Annotated[Optional[LangId], typer.Option()]
 
 
 @app.command()
@@ -33,7 +30,7 @@ def ls(lang: LangOpt = None) -> None:
 
 
 @app.command()
-def cat(lang: str, slug: str, ref: str) -> None:
+def cat(lang: LangId, slug: DocId, ref: str) -> None:
     """Print a passage to stdin"""
     tb = corpus.get_treebank(lang, slug)
     passage = tb[ref]
