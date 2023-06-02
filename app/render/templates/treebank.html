@@ -1,15 +1,14 @@
-{% extends "base.html.j2" %}
-{% block title %}Chunk{% endblock %}
-{% block head %}
-<link rel="stylesheet" href="/static/styles.css">
+% extends "base.html"
+% block head
+<link rel="stylesheet" href="/reader.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cash/8.1.5/cash.min.js"></script>
 <script src="https://unpkg.com/@popperjs/core@2"></script>
 <script src="https://unpkg.com/tippy.js@6"></script>
-<script src="/static/reader.js" type="module"></script>
-{% endblock %}
+<script src="/reader.js" type="module"></script>
+% endblock
 
-{% block content %}
+% block content
 <div class="treebank {{ meta.writing_style }}">
 	{{ text }}
 </div>
-{% endblock %}
+% endblock

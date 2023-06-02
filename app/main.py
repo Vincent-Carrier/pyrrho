@@ -4,9 +4,9 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from rich.logging import RichHandler
 
 from app import corpus
-from app.logger import get_logger_config
 
 app = FastAPI()
 
@@ -30,19 +30,17 @@ def langs():
     }
 
 
-if __name__ == "__main__":
-    logger_config = get_logger_config()
-    log_config = logging.basicConfig(  # type: ignore
-        level=logger_config.level,
-        format=logger_config.format,
-        datefmt=logger_config.date_format,
-        handlers=logger_config.handlers,
-    )
-    uvicorn.run(
-        "app.main:app",
-        reload=True,
-        host="0.0.0.0",
-        log_level="debug",
-        use_colors=True,
-        log_config=log_config,
-    )
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)s: %(asctime)s \t%(message)s",
+    datefmt="%d-%b-%y %H:%M:%S",
+    handlers=[RichHandler(rich_tracebacks=True)],
+)
+
+uvicorn.run(
+    "app.main:app",
+    port=8888,
+    reload=True,
+    log_level="debug",
+    use_colors=True,
+)
