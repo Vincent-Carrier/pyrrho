@@ -5,8 +5,7 @@ from core import corpus
 from core.render import HtmlPartialRenderer
 from core.utils import filter_none
 
-for lang, slug in corpus.all_treebanks():
-    tb = corpus.get_treebank(lang, slug)
+for slug, tb in corpus.all_treebanks().items():
     dir = tb.meta.partial_path.parent
     dir.mkdir(parents=True, exist_ok=True)
     meta = dir / "metadata.json"

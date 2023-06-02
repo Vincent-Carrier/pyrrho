@@ -1,6 +1,6 @@
 py := poetry run python
 lexicons := data/ag/lsj.db
-partials := $(wildcard build/partials/**.html)
+partials := $(wildcard build/**.html)
 css := static/styles.css
 sass := $(wildcard styles/**.sass)
 
@@ -9,6 +9,11 @@ sass := $(wildcard styles/**.sass)
 default: $(lexicons)
 	poetry install
 	npm install
+
+watch:
+	make $(css) -- -w &
+	npx browser-sync start -p 0.0.0.0:8000 -w -f static/** core/** build/** --no-open &
+	make app
 
 app: $(lexicons)
 	$(py) -m app.main

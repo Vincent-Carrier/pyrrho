@@ -10,6 +10,9 @@
 		font-size: nth($fs, 1)
 		line-height: nth($fs, 2)
 
+@mixin font-family($fam)
+	font-family: #{map.get($font-families, $fam)}
+
 @mixin shadow($shadow)
 	box-shadow: #{map.get($shadows, $shadow)}
 

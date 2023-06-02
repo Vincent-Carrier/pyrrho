@@ -34,7 +34,7 @@ class Metadata:
 
     @property
     def partial_path(self) -> Path:
-        dir = BUILD / "partials" / self.lang / slugify(self.authorship)
+        dir = BUILD / self.lang / slugify(self.authorship)
         if self.ref:
             return dir / self.slug / f"{self.ref}.html"
         else:

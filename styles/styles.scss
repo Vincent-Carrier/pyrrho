@@ -1,0 +1,51 @@
+@use 'foundation' as *;
+@import url('https://fonts.googleapis.com/css2?family=Alegreya:wght=400..900&display=swap');
+
+body {
+  max-width: 65ch;
+  @include text(gray(), xl, serif);
+  @include box($mx: auto, $px: 4, $py: 4);
+}
+
+.verb {
+  @include text($wght: 700);
+}
+
+.nominative {
+  @include text(emerald(600));
+}
+
+.accusative {
+  @include text(sky(600));
+}
+
+.dative {
+  @include text(pink(600));
+}
+
+.genitive {
+  @include text(violet(600));
+}
+
+.vocative {
+  @include text(teal(600));
+}
+
+.highlight {
+  @include surface(yellow(200));
+}
+
+.subdoc {
+  padding-right: len(2);
+}
+
+.verse {
+  padding-right: len(2);
+  @include text(gray(500), sm);
+}
+
+.sentence:not(:last-child)::after {
+  content: '—';
+  @include box($px: 2);
+  @include text(gray(500));
+}

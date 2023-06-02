@@ -8,8 +8,8 @@
 	padding-inline: len($px)
 	padding-block: len($py)
 
-@mixin surface($bg: null, $radius: null, $border: null, $shadow: null)
+@mixin surface($bg: null, $border: null, $rounded: null, $shadow: null)
 	background-color: $bg
-	+radius($radius)
-	+border($border)
+	border: $border
+	+radius($rounded)
 	+shadow($shadow)
