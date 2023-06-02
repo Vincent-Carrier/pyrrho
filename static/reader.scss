@@ -1,12 +1,3 @@
-@use 'foundation' as *;
-@import url('https://fonts.googleapis.com/css2?family=Alegreya:wght=400..900&display=swap');
-
-body {
-  max-width: 65ch;
-  @include text(gray(), xl, serif);
-  @include box($mx: auto, $px: 4, $py: 4);
-}
-
 .verb {
   @include text($wght: 700);
 }

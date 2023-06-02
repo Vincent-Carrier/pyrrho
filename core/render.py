@@ -2,20 +2,12 @@ from functools import singledispatch
 from typing import NamedTuple, assert_never
 
 import dominate.tags as h
-from jinja2 import Environment, PackageLoader
 
 from core.ref import Ref
 from core.token import FT
 from core.treebank import Treebank
-from core.treebank.treebank import Metadata
 from core.utils import cx
 from core.word import POS, Word
-
-jj = Environment(
-    loader=PackageLoader("core.render", "templates"),
-    lstrip_blocks=True,
-    trim_blocks=True,
-)
 
 
 @singledispatch
@@ -84,13 +76,3 @@ class HtmlPartialRenderer(NamedTuple):
     def render(self) -> str:
         return self.body().render()
 
-
-class HtmlDocumentRenderer(NamedTuple):
-    """Renders a treebank as a standalone HTML document"""
-
-    meta: Metadata
-
-    def render(self) -> str:
-        templ = jj.get_template("treebank.html.j2")
-        text = self.meta.partial_path.read_text()
-        return templ.render(text=text, meta=self.meta)

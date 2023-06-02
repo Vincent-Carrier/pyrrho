@@ -7,7 +7,8 @@ from typing_extensions import Annotated
 
 from core import corpus
 from core.corpus import DocId, LangId
-from core.render import TerminalRenderer
+
+from .render import TerminalRenderer
 
 app = typer.Typer()
 console = Console()

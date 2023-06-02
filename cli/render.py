@@ -4,9 +4,8 @@ from typing import assert_never
 from rich.console import Console
 from rich.style import Style
 
-from core.ref import Ref
+from core import Ref, Treebank
 from core.token import FT as FT
-from core.treebank import Treebank
 from core.word import POS, Case, Word
 
 console = Console()

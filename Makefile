@@ -1,8 +1,8 @@
 py := poetry run python
 lexicons := data/ag/lsj.db
 partials := $(wildcard build/**.html)
-css := static/styles.css
-sass := $(wildcard styles/**.sass)
+css := $(wildcard static/**.css)
+scss := $(wildcard static/**.scss)
 
 .PHONY: default app html export test format clean
 
@@ -23,8 +23,8 @@ html: $(partials)
 $(partials): $(lexicons) $(wildcard core/render/**)
 	$(py) scripts/partials.py
 
-$(css): $(sass)
-	sass styles/styles.sass $@
+$(css): $(scss)
+	sass --load-path=./styles static:static
 
 test:
 	poetry run pytest

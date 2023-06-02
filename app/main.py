@@ -12,7 +12,7 @@ app = FastAPI()
 
 app.include_router(corpus.router, prefix="/corpus", tags=["corpus"])
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/", StaticFiles(directory="static"), name="static")
 
 
 @app.get("/")
