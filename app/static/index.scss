@@ -1,10 +1,8 @@
 @use 'theme' as *;
 
-
 header {
-	h1 {
-		text-align: center;
-		text-transform: uppercase;
-		@include text(amber(950), 4xl, display);
+	h1,
+	p {
+		@include text( amber(950), $fam: display, $track: wider, $align: center, $transform: uppercase );
 	}
 }

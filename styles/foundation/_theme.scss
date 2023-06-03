@@ -35,6 +35,10 @@ $sizes: (
 	auto: auto,
 	full: 100%,
 );
+@function len($size) {
+  @return map.get($sizes, $size);
+}
+
 
 $font-sizes: (
 	xs: (
@@ -90,8 +94,30 @@ $font-sizes: (
 		1,
 	),
 );
+@mixin font-size($size) {
+  $fs: map.get($font-sizes, $size);
+  @if $fs {
+	font-size: nth($fs, 1);
+	line-height: nth($fs, 2);
+  }
+}
 
 $font-families: () !default;
+@mixin font-family($fam) {
+  font-family: #{map.get($font-families, $fam)};
+}
+
+$trackings: (
+	tighter: -0.05em,
+	tight: -0.025em,
+	normal: 0em,
+	wide: 0.025em,
+	wider: 0.05em,
+	widest: 0.1em,
+);
+@function tracking($tracking) {
+  @return map.get($trackings, $tracking);
+}
 
 $shadows: (
 	sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
@@ -103,6 +129,9 @@ $shadows: (
 	inner: 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
 	none: 'none',
 );
+@mixin shadow($shadow) {
+  box-shadow: #{map.get($shadows, $shadow)};
+}
 
 $radii: (
 	none: 0px,
@@ -115,28 +144,6 @@ $radii: (
 	3xl: 1.5rem,
 	full: 9999px,
 );
-
-
-@function len($size) {
-  @return map.get($sizes, $size);
-}
-
-@mixin font-size($size) {
-  $fs: map.get($font-sizes, $size);
-  @if $fs {
-    font-size: nth($fs, 1);
-    line-height: nth($fs, 2);
-  }
-}
-
-@mixin font-family($fam) {
-  font-family: #{map.get($font-families, $fam)};
-}
-
-@mixin shadow($shadow) {
-  box-shadow: #{map.get($shadows, $shadow)};
-}
-
 @mixin radius($radius) {
   border-radius: #{map.get($radii, $radius)};
 }

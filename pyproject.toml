@@ -22,6 +22,7 @@ ordered-enum = "^0.0.8"
 pycts = "^0.2.2"
 rich = "^13.3.5"
 python-slugify = "^8.0.1"
+watchdog = "^3.0.0"
 
 [tool.poetry.group.dev.dependencies]
 lxml-stubs = "^0.4.0"

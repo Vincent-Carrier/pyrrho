@@ -10,9 +10,11 @@ from app.routes import corpus
 app = Flask(__name__, static_url_path="/")
 app.jinja_options.update(
     autoescape=False,
+    auto_reload=True,
     lstrip_blocks=True,
     trim_blocks=True,
 )
+app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 
 @app.route("/")
