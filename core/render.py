@@ -75,4 +75,3 @@ class HtmlPartialRenderer(NamedTuple):
 
     def render(self) -> str:
         return self.body().render()
-

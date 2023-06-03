@@ -5,7 +5,7 @@ partials := $(wildcard build/**.html)
 scss := $(wildcard $(static)/**.scss)
 css := $(scss:.scss=.css)
 
-.PHONY: default app html css export test format clean
+.PHONY: default app partials css export test format clean
 
 default: $(lexicons)
 	poetry install
@@ -19,8 +19,7 @@ watch:
 app: $(lexicons)
 	$(py) -m app.main
 
-html: $(partials)
-$(partials): $(lexicons)
+partials:
 	$(py) scripts/partials.py
 
 css: $(css)

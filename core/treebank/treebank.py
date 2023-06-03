@@ -1,8 +1,16 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import (Generic, Iterator, Literal, NamedTuple, Optional, Protocol,
-                    Self, Type)
+from typing import (
+    Generic,
+    Iterator,
+    Literal,
+    NamedTuple,
+    Optional,
+    Protocol,
+    Self,
+    Type,
+)
 
 from slugify import slugify
 
@@ -27,7 +35,7 @@ class Metadata:
     @property
     def authorship(self) -> str:
         return self.author or "unknown"
-    
+
     @property
     def slug(self) -> str:
         return slugify(self.title)

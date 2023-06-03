@@ -7,6 +7,7 @@ from .corpus_entry import CorpusEntry, DocId
 
 LangId = NewType("LangId", str)
 
+
 class LangEntry(NamedTuple):
     name: str
     corpus: dict[DocId, CorpusEntry]
