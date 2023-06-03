@@ -1,10 +1,20 @@
-@use 'foundation' as *;
+@use 'theme' as *;
+@use "@fontsource/alegreya-sans-sc/scss/mixins" as AlegreyaSansSc;
+@use "@fontsource/cormorant/scss/mixins" as Cormorant;
+
 @import 'foundation/preflight.css';
-@import url('https://fonts.googleapis.com/css2?family=Alegreya:wght=400..900&display=swap');
+
+@include Cormorant.faces(
+	$weights: (
+		500,
+		600,
+	)
+);
 
 body {
 	font-synthesis: none;
 	max-width: 65ch;
 	@include text(gray(), xl, serif);
 	@include box($mx: auto, $px: 4, $py: 4);
+	@include surface(stone(50));
 }

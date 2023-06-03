@@ -1,0 +1,37 @@
+@use 'theme' as *;
+
+@mixin text($color: null, $size: null, $fam: null, $wght: null, $style: null) {
+	color: $color;
+	@include font-size($size);
+	@include font-family($fam);
+	font-weight: $wght;
+	font-style: $style;
+}
+
+@mixin box($w: null, $h: null, $mx: null, $my: null, $px: null, $py: null) {
+	width: len($w);
+	height: len($h);
+	margin-inline: len($mx);
+	margin-block: len($my);
+	padding-inline: len($px);
+	padding-block: len($py);
+}
+
+@mixin surface($bg: null, $border: null, $rounded: null, $shadow: null) {
+	background-color: $bg;
+	border: $border;
+	@include radius($rounded);
+	@include shadow($shadow);
+}
+
+@mixin flex-x($gap) {
+	display: flex;
+	flex-direction: row;
+	column-gap: len($gap);
+}
+
+@mixin flex-y($gap) {
+	display: flex;
+	flex-direction: column;
+	row-gap: len($gap);
+}

@@ -20,6 +20,7 @@
     "@fontsource/alegreya": "^5.0.2",
     "@fontsource/alegreya-sans": "^5.0.2",
     "@fontsource/alegreya-sc": "^5.0.2",
+    "@fontsource/cormorant": "^5.0.2",
     "@popperjs/core": "^2.11.8",
     "clsx": "^1.2.1",
     "ky": "^0.33.3",

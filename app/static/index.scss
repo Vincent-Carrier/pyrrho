@@ -1,0 +1,10 @@
+@use 'theme' as *;
+
+
+header {
+	h1 {
+		text-align: center;
+		text-transform: uppercase;
+		@include text(amber(950), 4xl, display);
+	}
+}

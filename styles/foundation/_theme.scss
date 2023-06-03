@@ -1,3 +1,5 @@
+@use 'sass:map';
+
 $sizes: (
 	px: 1px,
 	0: 0px,
@@ -89,11 +91,7 @@ $font-sizes: (
 	),
 );
 
-$font-families: (
-	sans: sans-serif,
-	serif: "'Alegreya', serif",
-	mono: monospace,
-);
+$font-families: () !default;
 
 $shadows: (
 	sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
@@ -117,3 +115,28 @@ $radii: (
 	3xl: 1.5rem,
 	full: 9999px,
 );
+
+
+@function len($size) {
+  @return map.get($sizes, $size);
+}
+
+@mixin font-size($size) {
+  $fs: map.get($font-sizes, $size);
+  @if $fs {
+    font-size: nth($fs, 1);
+    line-height: nth($fs, 2);
+  }
+}
+
+@mixin font-family($fam) {
+  font-family: #{map.get($font-families, $fam)};
+}
+
+@mixin shadow($shadow) {
+  box-shadow: #{map.get($shadows, $shadow)};
+}
+
+@mixin radius($radius) {
+  border-radius: #{map.get($radii, $radius)};
+}

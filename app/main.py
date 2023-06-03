@@ -1,5 +1,7 @@
-from flask import Flask
+from flask import Flask, render_template
 from rich import traceback
+
+from . import routes
 
 traceback.install()
 
@@ -12,17 +14,13 @@ app.jinja_options.update(
     trim_blocks=True,
 )
 
-app.register_blueprint(corpus.bp, url_prefix="/corpus")
+
+@app.route("/")
+def index():
+    return render_template("index.html")
 
 
-@app.route("/langs")
-def langs():
-    return {
-        "langs": [
-            {"id": "lat", "name": "Latin"},
-            {"id": "ag", "name": "Ancient Greek"},
-        ]
-    }
+app.register_blueprint(routes.corpus)
 
 
 app.run(debug=True)
