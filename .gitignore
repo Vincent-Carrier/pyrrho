@@ -162,5 +162,5 @@ cython_debug/
 scratch.ipynb
 *.db
 
-static/*.css
-static/*.css.map
+app/static/*.css
+app/static/*.css.map

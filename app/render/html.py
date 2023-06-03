@@ -6,9 +6,7 @@ from core import Metadata
 
 jj = Environment(
     loader=PackageLoader("app.render"),
-    lstrip_blocks=True,
-    trim_blocks=True,
-    line_statement_prefix="%",
+
 )
 
 

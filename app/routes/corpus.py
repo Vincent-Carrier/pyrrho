@@ -1,14 +1,11 @@
-from fastapi import APIRouter, HTTPException
-from fastapi.responses import HTMLResponse
+from flask import Blueprint, request
 
-from app.render import HtmlDocumentRenderer
 from core import corpus
 
-router = APIRouter()
-api_router = APIRouter()
+bp = Blueprint('corpus', __name__, url_prefix='/corpus')
 
 
-@router.get("/{lang}")
+@bp.route("/<lang>")
 async def get_index(lang: str):
     try:
         return corpus.index(lang)
@@ -16,8 +13,9 @@ async def get_index(lang: str):
         raise HTTPException(status_code=404, detail=f"Unknown language {lang}") from e
 
 
-@router.get("/{lang}/{slug}", response_class=HTMLResponse)
+@bp.route("/<lang>/<slug>")
 async def get_treebank(lang: str, slug: str, ref: str | None = None):
+    # if request.accept_mimetypes.best == "application/json":
     try:
         tb = corpus.get_treebank(lang, slug)
     except KeyError as e:

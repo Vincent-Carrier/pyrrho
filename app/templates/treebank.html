@@ -1,14 +1,14 @@
-% extends "base.html"
-% block head
+{% extends "base.html" %}
+{% block head %}
 <link rel="stylesheet" href="/reader.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cash/8.1.5/cash.min.js"></script>
 <script src="https://unpkg.com/@popperjs/core@2"></script>
 <script src="https://unpkg.com/tippy.js@6"></script>
 <script src="/reader.js" type="module"></script>
-% endblock
+{% endblock %}
 
-% block content
+{% block content %}
 <div class="treebank {{ meta.writing_style }}">
 	{{ text }}
 </div>
-% endblock
+{% endblock %}

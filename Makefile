@@ -1,7 +1,8 @@
 py := poetry run python
 lexicons := data/ag/lsj.db
+static := app/static
 partials := $(wildcard build/**.html)
-scss := $(wildcard static/**.scss)
+scss := $(wildcard $(static)/**.scss)
 css := $(scss:.scss=.css)
 
 .PHONY: default app html css export test format clean
@@ -12,7 +13,7 @@ default: $(lexicons)
 
 watch:
 	make css -- -w &
-	npx browser-sync start -p :8000 -w -f static/** core/** build/** --no-open &
+	npx browser-sync start -p :8000 -w -f $(static)/** core/** build/** --no-open &
 	make app
 
 app: $(lexicons)
@@ -24,7 +25,7 @@ $(partials): $(lexicons)
 
 css: $(css)
 $(css): $(scss)
-	npx sass --load-path=./styles static:static
+	npx sass --load-path=./styles $(static):$(static)
 
 test:
 	poetry run pytest
@@ -36,7 +37,7 @@ db_clean:
 	rm -f $(lexicons)
 
 clean:
-	rm -rf build $(css) static/**.map
+	rm -rf build $(css) $(static)/**.map
 
 $(lexicons):
 	$(py) scripts/seed.py

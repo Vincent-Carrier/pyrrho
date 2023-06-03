@@ -1,26 +1,28 @@
 import logging
 
-import uvicorn
-from fastapi import FastAPI
-from fastapi.responses import RedirectResponse
-from fastapi.staticfiles import StaticFiles
+from flask import Flask
 from rich.logging import RichHandler
 
-from app import corpus
+from app.routes import corpus
 
-app = FastAPI()
+app = Flask(__name__)
+app.jinja_options.update(
+    lstrip_blocks=True,
+    trim_blocks=True,
+)
 
+app.register_blueprint(corpus.bp, url_prefix="/corpus")
 app.include_router(corpus.router, prefix="/corpus", tags=["corpus"])
 
 app.mount("/", StaticFiles(directory="static"), name="static")
 
 
-@app.get("/")
+@app.route("/")
 async def root():
     return RedirectResponse("/docs")
 
 
-@app.get("/langs")
+@app.route("/langs")
 def langs():
     return {
         "langs": [
