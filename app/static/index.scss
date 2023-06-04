@@ -1,15 +1,15 @@
 @use 'theme' as *;
 
 header {
-  h1,
-  p {
-    @include text($fam: display, $align: center, $transform: uppercase);
-  }
+    h1,
+    p {
+        @include text($fam: display, $align: center, $transform: uppercase);
+    }
 
-  h1 {
-	@include text($size: 4xl, $wght: 600, $track: wider);
-  }
-  p {
-	@include text($size: lg, $wght: 500, $track: wider);
-  }
+    h1 {
+        @include text($size: 4xl, $wght: 600, $track: wider);
+    }
+    p {
+        @include text($size: lg, $wght: 500, $track: wider);
+    }
 }
