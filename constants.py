@@ -1,11 +1,14 @@
+import os
 import shelve
-from os import environ as ENV
 from pathlib import Path
 
+from box import Box
 
-ROOT = Path(__file__).parent.parent
+ENV = Box(os.environ)
+ROOT = Path(__file__).parent
 BUILD = ROOT / "build"
 DATA = ROOT / "data"
+NODE_MODULES = ROOT / "node_modules"
 AG = DATA / "ag"
 
 PUNCTUATION = [".", ",", ";", ":", "·", "]", ")"]

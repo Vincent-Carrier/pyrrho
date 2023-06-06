@@ -2,7 +2,7 @@ import csv
 import re
 from itertools import islice
 
-from core.constants import AG, LSJ
+from constants import AG, LSJ
 
 TRAILING_REGEX = re.compile(r"(\s|\.|,|;)+$")
 

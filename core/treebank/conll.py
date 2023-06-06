@@ -5,7 +5,7 @@ import pyconll
 from pyconll.unit.conll import Conll
 from pyconll.unit.token import Token as ConllToken
 
-from core.constants import LSJ
+from constants import LSJ
 from core.ref import Ref, T
 from core.token import FT, Token
 from core.treebank import Treebank

@@ -1,4 +1,4 @@
-from core.constants import AG
+from constants import AG
 from core.ref import BCV, CV, Line
 from core.treebank import GntTB, Metadata, PerseusTB
 

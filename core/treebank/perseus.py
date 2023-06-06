@@ -6,7 +6,7 @@ from typing import Iterator, Self, Type, cast, final
 from lxml import etree
 from pyCTS import CTS_URN
 
-from core.constants import LSJ, PUNCTUATION
+from constants import LSJ, PUNCTUATION
 from core.ref import Ref, T
 from core.token import FT, Token
 from core.treebank import Treebank

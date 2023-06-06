@@ -13,7 +13,7 @@ default: $(lexicons)
 
 watch:
 	npx sass -Istyles -Inode_modules $(static):$(static) --watch &
-	make app
+	$(MAKE) app
 
 app: $(lexicons)
 	$(py) -m app.main

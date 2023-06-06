@@ -1,20 +1,19 @@
 from flask import Flask, render_template
+from livereload import Server
 from rich import traceback
 
 from . import routes
 
 traceback.install()
 
-from app.routes import corpus
 
 app = Flask(__name__, static_url_path="/")
 app.jinja_options.update(
     autoescape=False,
-    auto_reload=True,
     lstrip_blocks=True,
     trim_blocks=True,
 )
-app.config["TEMPLATES_AUTO_RELOAD"] = True
+app.debug = True
 
 
 @app.route("/")
@@ -23,6 +22,11 @@ def index():
 
 
 app.register_blueprint(routes.corpus)
+app.register_blueprint(routes.fonts)
+app.register_blueprint(routes.shoelace)
 
-
-app.run(debug=True)
+server = Server(app)
+server.watch("app/templates/**.html")
+server.watch("app/static/**.css")
+server.watch("app/static/**.js")
+server.serve(port=5000)

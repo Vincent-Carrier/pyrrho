@@ -1,7 +1,7 @@
 @use 'foundation' as *;
 
 .verb {
-    @include text($wght: 700);
+    @include font($wght: 700);
 }
 
 .nominative {

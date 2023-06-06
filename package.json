@@ -12,7 +12,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "browser-sync": "^2.29.3",
     "esbuild": "^0.17.19",
     "sass": "^1.62.1"
   },
@@ -22,6 +21,7 @@
     "@fontsource/alegreya-sc": "^5.0.2",
     "@fontsource/cormorant": "^5.0.2",
     "@popperjs/core": "^2.11.8",
+    "@shoelace-style/shoelace": "^2.4.0",
     "clsx": "^1.2.1",
     "ky": "^0.33.3",
     "lodash-es": "^4.17.21"

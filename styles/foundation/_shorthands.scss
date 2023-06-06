@@ -1,23 +1,47 @@
 @use 'theme' as *;
+@use 'sass:map';
 
 @mixin text(
     $color: null,
     $size: null,
-    $fam: null,
-    $wght: null,
-    $style: null,
     $track: null,
     $align: null,
-    $transform: null
+    $transform: null,
 ) {
     color: $color;
     @include font-size($size);
-    @include font-family($fam);
-    font-weight: $wght;
-    font-style: $style;
     letter-spacing: tracking($track);
     text-align: $align;
     text-transform: $transform;
+}
+
+@mixin font(
+	$fam: null,
+	$wght: null,
+	$style: null,
+) {
+	@include font-family($fam);
+	font-weight: $wght;
+	font-style: $style;
+}
+
+@mixin layout($display: null, $position: null, $justify: null, $align: null, $place: null) {
+	display: $display;
+	position: $position;
+	@if type-of($justify) == map {
+		justify-content: map.get($justify, 'content');
+		justify-items: map.get($justify, 'items');
+		justify-self: map.get($justify, 'self');
+	} @else {
+		justify-content: $justify;
+	}
+	@if type-of($align) == map {
+		align-content: map.get($align, 'content');
+		align-items: map.get($align, 'items');
+		align-self: map.get($align, 'self');
+	} @else {
+		align-items: $align;
+	}
 }
 
 @mixin box(
